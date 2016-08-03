@@ -2,8 +2,8 @@ from TEMPy.MapParser import *
 from TEMPy.ScoringFunctions import *
 import scipy.signal as sps
 
-input_path = "/home/bar/Downloads/emd_1094.map"
-cylinder_path = "/home/bar/Downloads/Cylinder.mrc"
+input_path = "./source/emd_1094.map"
+cylinder_path = "./source/Cylinder.mrc"
 target_map = MapParser.readMRC(input_path)
 cylinder_map = MapParser.readMRC(cylinder_path)
 
@@ -11,7 +11,7 @@ cylinder_map = MapParser.readMRC(cylinder_path)
 nparr = cylinder_map.fullMap
 nparr = nparr[50:57, 47:54, 47:54] # shape: 7X7X7
 
-a = sps.correlate(nparr, target_map.fullMap, mode="valid")
+a = sps.correlate(target_map.fullMap, nparr, mode="valid")
 
 
 print(a.shape)
