@@ -10,6 +10,7 @@ cylinder_path = "./source/Cylinder.mrc"
 target_map = MapParser.readMRC(input_path)
 cylinder_map = MapParser.readMRC(cylinder_path)
 
+
 # trim cylinder to it smallest form
 cylinder_array = cylinder_map.fullMap
 cylinder_array = cylinder_array[50:57, 47:54, 47:54] # shape: 7X7X7
@@ -21,19 +22,17 @@ cylinder_array = gaussian_filter(cylinder_array, sigma)
 cylinder_map.fullMap = cylinder_array
 
 max_scores = np.zeros(target_map.box_size())
-max_dirs = np.zeros(target_map.box_size(), dtype=(float,2))
+max_dirs = np.zeros(target_map.box_size(), dtype=(float, 2))
 
 
 sanity = 0
-rad_in_x = 0 # accumulate rotation in the x axis (in rads)
 for i in range (12): #for every x rotation
-    rad_in_x += (math.pi/12) * i
-    rad_in_y = 0 #accumulate rotation in the y axis (in rads)
-    for j in range (12): #for every y rotation
-        rad_in_y += (math.pi/12) * j
-        template_cylinder = cylinder_map
-        template_cylinder.rotate_by_axis_angle(x=1, y=0, z=0, angle=rad_in_x, CoM=cylinder_map.centre(), rad=True)
-        template_cylinder.rotate_by_axis_angle(x=0, y=1, z=0, angle=rad_in_y, CoM=cylinder_map.centre(), rad=True)
+    rad_in_x = (math.pi/12) * i # x axis rotation (in rads)
+    for j in range (12): # for every y rotation
+        rad_in_y = (math.pi/12) * j # y axis rotation (in rads)
+        template_cylinder = cylinder_map.rotate_by_axis_angle(x=1, y=0, z=0, angle=rad_in_x, CoM=cylinder_map.centre(), rad=True)
+        template_cylinder = template_cylinder.rotate_by_axis_angle(x=0, y=1, z=0, angle=rad_in_y, CoM=template_cylinder.centre(), rad=True)
+        #template_cylinder.write_to_MRC_file("template{0}{1}.mrc".format(i,j))
         correlation_matrix = correlate(target_map.fullMap, template_cylinder.fullMap, mode="same")
         # scipy correlate is super-slow :(
         for (x,y,z), value in np.ndenumerate(correlation_matrix):
