@@ -6,8 +6,8 @@ from scipy.signal import correlate
 from TEMPy.EMMap import Map
 import numpy as np
 
-input_path = "./source/emd_1094.map"
-cylinder_path = "./source/Cylinder.mrc"
+input_path = "/home/guloo/Downloads/emd_1094.map"
+cylinder_path = "/home/guloo/Downloads/Cylinder.mrc"
 target_map = MapParser.readMRC(input_path)
 cylinder_map = MapParser.readMRC(cylinder_path)
 
@@ -48,7 +48,6 @@ for i in range (12):  # for every x rotation
 
 print max_scores
 print max_dirs
-
 
 #score = s.CCC(cylinder_map, t)
 
