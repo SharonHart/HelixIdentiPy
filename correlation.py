@@ -5,13 +5,17 @@ from scipy.signal import correlate
 import os
 from messages import Messages
 
-""""Correlates between the target and the generated templates. Returns score matrix and direciton matrix"""
+""""Correlates between the target and the generated templates. Returns score matrix and direction matrix"""
 
 
 def main(target_map):
+    debug = True
 
     print Messages.START_CORRELATION
+    dir_path = os.path.dirname(os.path.realpath(__file__))
 
+    if debug and os.path.isfile(dir_path + "/correlation" + "/max_score"):
+        return np.load(dir_path + "/correlation" + "/max_score"), np.load(dir_path + "/correlation" + "/max_dirs")
     max_scores = np.zeros(target_map.box_size())
     max_dirs = np.zeros(target_map.box_size(), dtype=(float, 2))
     dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -37,5 +41,17 @@ def main(target_map):
                     max_dirs[x, y, z] = (rad_in_x, rad_in_y)
 
     print Messages.DONE_CORRELATION
+    if debug:
+
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        if not os.path.exists(dir_path + "/correlation"):
+            os.makedirs(dir_path + "/correlation")
+
+        score_file = open(dir_path + "/correlation" + "/max_score", "w+")
+        dirs_file = open(dir_path + "/correlation" + "/max_dirs", "w+")
+        np.save(score_file, max_scores)
+        np.save(dirs_file, max_dirs)
+        score_file.close()
+        dirs_file.close()
 
     return max_scores, max_dirs
