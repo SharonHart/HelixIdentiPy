@@ -11,12 +11,15 @@ def main(target_map, cylinder_map, overwrite=False):
 
     print Messages.START_TEMPLATES
 
-
-    # trim cylinder to it smallest form
     cylinder_array = cylinder_map.fullMap
-    cylinder_array = cylinder_array[50:57, 47:54, 47:54]  # shape: 7X7X7
 
-    # smooth cylinder by gaussian mask TODO: figure out how to get sigma and what function to use
+    #just a test, delete it after
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    directory = dir_path + "/Templates"
+    cylinder_map.write_to_MRC_file(directory + "/template{0}_{1}.mrc".format(150, 200))
+
+#
+ #   # smooth cylinder by gaussian mask TODO: figure out how to get sigma and what function to use
     sigma = target_map.apix
     cylinder_array = gaussian_filter(cylinder_array, sigma)
 
@@ -43,3 +46,4 @@ def main(target_map, cylinder_map, overwrite=False):
 
             sanity += 1
     print Messages.DONE_TEMPLATES.format(sanity)
+

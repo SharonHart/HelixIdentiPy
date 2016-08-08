@@ -4,6 +4,7 @@ from TEMPy.MapParser import *
 from create_templates import main as create_templates
 from correlation import main as correlate
 from messages import Messages
+from create_cylinder import cylinder_creation
 
 
 def main():
@@ -15,6 +16,8 @@ def main():
 
     # read input files
     target_path = sys.argv[1]
+
+    cylinder_creation(target_path);
     ideal_cyl = dir_path + "/source/Cylinder.mrc"
 
     res = 0
@@ -24,8 +27,10 @@ def main():
     try:
         target_map = MapParser.readMRC(target_path)
         cylinder_map = MapParser.readMRC(ideal_cyl)
-    except:
-        print Messages.INPUT_FILES_ERROR
+    except Exception as e:
+        print e
+    #except:
+    #    print Messages.INPUT_FILES_ERROR
 
     # generate templates
     create_templates(target_map, cylinder_map)
