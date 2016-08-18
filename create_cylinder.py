@@ -23,45 +23,17 @@ def cylinder_creation(path):
     # print structure_instance
 
     map_target = MapParser.readMRC(path)  # read target map
-    print map_target
-    print map_target.get_com()
-    print "map information"
-    print "x"
-    print map_target.x_origin()
-    print "y"
-    print map_target.y_origin()
-    print "z"
-    print map_target.z_origin()
-    print "box size"
-    print map_target.box_size()
-    print "map_size"
-    print map_target.map_size()
-    print 'min and max map'
-    print map_target.min()
-    print map_target.max()
-    print 'scale_map'
-    print map_target.scale_map(10)
-
-    print "Modifying maps"
-    print "rotate map"
-    # map_target2 = map_target.rotate_by_axis_angle(10, 3.7, 12.4, 45,
-     #                                             structure_instance.CoM)  # Rotation around centre of mass of structure_instance
-    # print map_target2
-    print "translate map"
-    map_target3 = map_target.translate(5.2, 5, 1)  # Translation. Uses fourier-shifting, so movements are periodic.
-    print map_target3
-    print "normalise map"
-    map_target4 = map_target.normalise()  # Normalising (mean=0, sd=1)
-    print map_target4
+    # map_target3 = map_target.translate(5.2, 5, 1)  # Translation. Uses fourier-shifting, so movements are periodic.
+    # map_target4 = map_target.normalise()  # Normalising (mean=0, sd=1)
 
     # MARK addition for students
     # 1. Save Map after translations
-    map_target.write_to_MRC_file('Map_After_Processing.mrc')
+    map_target.write_to_MRC_file(path_out + 'Map_After_Processing.mrc')
 
     # 2 Very very simple example of the cylinder
-    dr = 4;  # radius of the cylinder
-    h = 20;  # height of the cylinder
-    rho = 3;  # density of the cylinder
+    dr = 2.3;  # radius of the cylinder
+    h = 10.8;  # height of the cylinder
+    rho = 1;  # density of the cylinder
 
     map_target.shift_origin(0, 0, 0)
 
@@ -81,4 +53,4 @@ def cylinder_creation(path):
                 else:
                     map_target.fullMap[z][y][x] = 0
 
-    map_target.write_to_MRC_file('Cylinder.mrc')
+    map_target.write_to_MRC_file(path_out + 'Cylinder.mrc')

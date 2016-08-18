@@ -17,7 +17,7 @@ def main():
     # read input files
     target_path = sys.argv[1]
 
-    cylinder_creation(target_path);
+    cylinder_creation(target_path)
     ideal_cyl = dir_path + "/source/Cylinder.mrc"
 
     res = 0
@@ -33,10 +33,11 @@ def main():
     #    print Messages.INPUT_FILES_ERROR
 
     # generate templates
-    create_templates(target_map, cylinder_map)
+    create_templates(target_map, cylinder_map, overwrite=False)
 
     # compute correlation
     max_score, max_dirs = correlate(target_map)
+    pass
 
 
 if __name__ == "__main__":
