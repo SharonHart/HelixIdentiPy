@@ -5,6 +5,7 @@ from create_templates import main as create_templates
 from correlation import main as correlate
 from messages import Messages
 from create_cylinder import cylinder_creation
+from graph import graph_creation
 
 
 def main():
@@ -37,6 +38,8 @@ def main():
 
     # compute correlation
     max_score, max_dirs = correlate(target_map)
+
+    graph_creation(max_score,max_dirs)
     pass
 
 

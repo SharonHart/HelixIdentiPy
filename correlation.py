@@ -8,14 +8,15 @@ from template_match import template_matching
 from scipy.ndimage.interpolation import shift
 
 from norm_xcorr import norm_xcorr
-from sklearn.cross_decomposition import CCA
+# from sklearn.cross_decomposition import CCA
 """"Correlates between the target and the generated templates. Returns score matrix and direction matrix"""
 
 corr_dir = "/correlation"
 
 def main(target_map):
-    save_results = True
-    correlate_either_way = True
+    THRESHOLD = 70
+    save_results = False
+    correlate_either_way = False
 
     print Messages.START_CORRELATION
     dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -56,8 +57,8 @@ def main(target_map):
             # template = template_cylinder.translate(cZ,cY,cX)
             # template.fullMap = shift(template_cylinder.fullMap, [cZ,cY,cX])
             # try:
-            # correlation_matrix = np.fft.ifftn(np.multiply(np.fft.fftn(target_map.fullMap), np.conj(np.fft.fftn(template_cylinder.fullMap))))
-            correlation_matrix = template_matching(template_cylinder.fullMap, target_map.fullMap)
+            correlation_matrix = np.fft.ifftn(np.multiply(np.fft.fftn(target_map.fullMap), np.conj(np.fft.fftn(template_cylinder.fullMap))))
+            # correlation_matrix = template_matching(template_cylinder.fullMap, target_map.fullMap)
             # correlation_matrix = np.fft.ifft(np.multiply(np.fft.fft(target_map.fullMap, norm="ortho"), np.conj(np.fft.fft(template_cylinder.fullMap, norm="ortho"))), norm="ortho")
 
             # correlation_matrix = norm_xcorr(template_cylinder.fullMap, target_map.fullMap)
@@ -65,11 +66,11 @@ def main(target_map):
             # sF = ScoringFunctions()
             # value = sF.CCC(target_map, template)
             for (x, y, z), value in np.ndenumerate(correlation_matrix):
-                if value > max_scores[x, y, z]:
+                if value > max_scores[x, y, z] and value > THRESHOLD:
                     max_scores[x, y, z] = value
                     max_dirs[x, y, z] = (rad_in_x, rad_in_y)
                     # print value
-                    if value >=0.3:
+                    if value >=THRESHOLD:
                         values_above_thr_counter += 1
                     if value > 100:
                         print "no good"
@@ -90,7 +91,7 @@ def main(target_map):
         np.save(dirs_file, max_dirs)
         score_file.close()
         dirs_file.close()
-        checkitout()
+        # checkitout()
     return max_scores, max_dirs
 
 def local_sum(I, t):
