@@ -2,12 +2,12 @@ import numpy as np
 from matplotlib.mlab import PCA
 
 class Node:
-    def __init__(self, voxel, direction, score, region=None):
+    def __init__(self, voxel, direction, pca_dir, score, region=None):
         self.region = region
         self.voxel = voxel
         self.direction = direction
         self.score = score
-
+        self.pca_dir = pca_dir
 
 
 class Graph:

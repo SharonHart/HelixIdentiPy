@@ -2,6 +2,9 @@ import numpy as np
 from TEMPy.MapParser import *
 from TEMPy.ScoringFunctions import *
 import os
+
+from matplotlib.mlab import PCA
+
 from messages import Messages
 from checout_matrix import checkitout
 from template_match import template_matching
@@ -39,7 +42,10 @@ def main(target_map):
             print template_name
             try:
                 template_cylinder = MapParser.readMRC(templates_dir + template_name)
-            except:
+
+
+            except Exception as e:
+                print e
                 print Messages.ERROR_READING_TEMPLATE_FILE.format(template_name)
 
             # size = template_cylinder.box_size()
@@ -56,8 +62,8 @@ def main(target_map):
             template = template_cylinder
             # template = template_cylinder.translate(cZ,cY,cX)
             # template.fullMap = shift(template_cylinder.fullMap, [cZ,cY,cX])
-            # try:
-            correlation_matrix = np.fft.ifftn(np.multiply(np.fft.fftn(target_map.fullMap), np.conj(np.fft.fftn(template_cylinder.fullMap))))
+            try:
+                correlation_matrix = np.fft.ifftn(np.multiply(np.fft.fftn(target_map.fullMap), np.conj(np.fft.fftn(template_cylinder.fullMap))))
             # correlation_matrix = template_matching(template_cylinder.fullMap, target_map.fullMap)
             # correlation_matrix = np.fft.ifft(np.multiply(np.fft.fft(target_map.fullMap, norm="ortho"), np.conj(np.fft.fft(template_cylinder.fullMap, norm="ortho"))), norm="ortho")
 
@@ -65,18 +71,18 @@ def main(target_map):
             # val = correlate(target_map.normalise().getMap(), template.normalise().getMap())
             # sF = ScoringFunctions()
             # value = sF.CCC(target_map, template)
-            for (x, y, z), value in np.ndenumerate(correlation_matrix):
-                if value > max_scores[x, y, z] and value > THRESHOLD:
-                    max_scores[x, y, z] = value
-                    max_dirs[x, y, z] = (rad_in_x, rad_in_y)
-                    # print value
-                    if value >=THRESHOLD:
-                        values_above_thr_counter += 1
-                    if value > 100:
-                        print "no good"
-            # except Exception as e:
-            #     print e
-            #     print Messages.CORRELATION_ERROR.format(template_name)
+                for (x, y, z), value in np.ndenumerate(correlation_matrix):
+                    if value > max_scores[x, y, z]:
+                        max_scores[x, y, z] = value
+                        max_dirs[x, y, z] = (rad_in_x, rad_in_y)
+                        # print value
+                        if value >=THRESHOLD:
+                            values_above_thr_counter += 1
+                #         if value > 100:
+                #             print "no good"
+            except Exception as e:
+                print e
+                print Messages.CORRELATION_ERROR.format(template_name)
 
     print Messages.DONE_CORRELATION
     if save_results:

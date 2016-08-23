@@ -7,7 +7,7 @@ graph = Graph()
 directions = None
 scores = None
 
-def graph_creation(score_matrix, max_dir, THRESHOLD=70):
+def graph_creation(score_matrix, max_dir, dic_directions, THRESHOLD=87):
 
     scores = score_matrix
     directions = max_dir
@@ -20,7 +20,7 @@ def graph_creation(score_matrix, max_dir, THRESHOLD=70):
     for (x,y,z), value in np.ndenumerate(score_matrix):
         if value >= THRESHOLD:
             region = Region()
-            node = Node([x,y,z], max_dir[x,y,z], value, region=region)
+            node = Node([x,y,z], max_dir[x,y,z], dic_directions[max_dir[x,y,z][0],max_dir[x,y,z][1]], value, region=region)
             region.nodes.append(node)
             graph.nodes.append(node)
             graph.regions.append(region)
@@ -36,9 +36,9 @@ def graph_creation(score_matrix, max_dir, THRESHOLD=70):
         for j in range(i+1, len(graph.nodes)):
             node2 = graph.nodes[j]
             if should_connect(node1, node2):
+                print i,j
                 connect(node1, node2)
-
-    print "done!"
+    return graph
 def is_neighbours(node1, node2):
     return (node1.voxel[0] - node2.voxel[0] >= -1 and node1.voxel[0] - node2.voxel[0] <= 1) and \
             (node1.voxel[1] - node2.voxel[1] >= -1 and node1.voxel[1] - node2.voxel[1] <= 1) and \
@@ -56,9 +56,9 @@ def angle(v1, v2):
 
 
 def theta_parallel(node1, node2, theta):
-    v1 = np.append(node1.direction, [1])
-    v2 = np.append(node2.direction, [1])
-    return angle(v1, v2) <= theta
+    # v1 = np.append(node1.direction, [1])
+    # v2 = np.append(node2.direction, [1])
+    return angle(node1.pca_dir, node2.pca_dir)*57.2958 <= theta
 
 
 def pairwise_region_parallelism(region1, region2, theta):
@@ -68,14 +68,19 @@ def pairwise_region_parallelism(region1, region2, theta):
     return True
 
 
-def region_pca_parallelism(region): #todo   how to calc angle between pca and nodes diretion
-
-    region.calc_pca()
-    # for node in region.nodes:
-        # v1 = np.append(node.direction
-        # if angle(node.)
-        # return False
-    return True if random.random() <=0.5 else False
+def region_pca_parallelism(region, theta=20): #   how to calc angle between pca and nodes direction
+    if len(region.nodes) == 0:
+        pass
+    try:
+        region.calc_pca()
+    except Exception as e:
+        print "pca problem fuck this shit"
+        return False
+    for node in region.nodes:
+        if region.pca and angle(node.pca_dir, region.pca.Wt[0])*57.2958 > theta:
+            return False
+    print "hallelujah!"
+    return True
 
 def is_theta_parallel(node1, node2, theta=20):
     r1 = node1.region
@@ -85,7 +90,7 @@ def is_theta_parallel(node1, node2, theta=20):
     if r1 == r2: return False
 
     # regions are small - still no PCA
-    if (len(r1.nodes) + len(r2.nodes)) < 8:
+    if (len(r1.nodes) + len(r2.nodes)) <= 8:
         return pairwise_region_parallelism(r1, r2, theta)
 
     # need to check pca
@@ -112,14 +117,27 @@ def connect(node1, node2):
     r_new = Region()
     r_new.nodes = node1.region.nodes + node2.region.nodes
     graph.regions.append(r_new)
-    if len(r_new.nodes) >= 8: r_new.calc_pca()
+    if len(r_new.nodes) > 8:
+        try:
+            r_new.calc_pca()
+        except Exception as e:
+            print "pca problem fuck this shit22222"
     for node in r_new.nodes:
         node.region = r_new
 
-
-
-
-
+def connect_regions(node1, node2):
+    if node1.region == node2.region:
+        print "shit!"
+    r_new = Region()
+    r_new.nodes = node1.region.nodes + node2.region.nodes
+    if len(r_new.nodes) > 8:
+        try:
+            r_new.calc_pca()
+        except Exception as e:
+            print "pca problem fuck this shit22222"
+    for node in r_new.nodes:
+        node.region = r_new
+    return r_new
 
 # --------------------OLD CODE------------------------#
 
