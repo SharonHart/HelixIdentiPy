@@ -5,6 +5,10 @@ from create_templates import main as create_templates
 from correlation import main as correlate
 from messages import Messages
 from create_cylinder import cylinder_creation
+from graph import graph_creation
+from linkage import link_regions
+import pickle
+from matplotlib.mlab import PCA
 
 
 def main():
@@ -27,17 +31,27 @@ def main():
     try:
         target_map = MapParser.readMRC(target_path)
         cylinder_map = MapParser.readMRC(ideal_cyl)
+
     except Exception as e:
         print e
     #except:
     #    print Messages.INPUT_FILES_ERROR
 
     # generate templates
-    create_templates(target_map, cylinder_map, overwrite=False)
+    dic_directions = create_templates(target_map, cylinder_map, overwrite=False)
 
     # compute correlation
     max_score, max_dirs = correlate(target_map)
-    pass
+
+    # graph = graph_creation(max_score, max_dirs, dic_directions)
+    #
+    # with open(dir_path + "/source/graph.p", 'wb') as f:
+    #     pickle.dump(graph, f)
+
+    with open(dir_path + "/source/graph.p", 'rb') as g:
+        graph = pickle.load(g)
+
+    link_regions(graph)
 
 
 if __name__ == "__main__":
