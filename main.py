@@ -47,7 +47,7 @@ def main():
     #
     # with open(dir_path + "/source/graph.p", 'wb') as f:
     #     pickle.dump(graph, f)
-
+    # 
     with open(dir_path + "/source/graph.p", 'rb') as g:
         graph = pickle.load(g)
 
