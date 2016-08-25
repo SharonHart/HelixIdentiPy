@@ -1,6 +1,7 @@
 import numpy as np
 from TEMPy.ScoringFunctions import *
-from matplotlib.mlab import PCA
+#from matplotlib.mlab import PCA
+from sklearn.decomposition import PCA
 from scipy.ndimage.filters import gaussian_filter
 import os
 import pickle
@@ -14,6 +15,7 @@ from messages import Messages
 
 def main(target_map, cylinder_map, overwrite=False):
     dic = {}
+    pc = PCA(n_components=3)
     print Messages.START_TEMPLATES
 
     cylinder_array = cylinder_map.fullMap
@@ -36,7 +38,6 @@ def main(target_map, cylinder_map, overwrite=False):
 
 
     sanity = 0
-    prev_pca = [0, 0, 1]
 
     for i in range(12):  # for every x rotation
         rad_in_x = (math.pi / 12) * i  # x axis rotation (in rads)
@@ -56,10 +57,11 @@ def main(target_map, cylinder_map, overwrite=False):
                     for x in range(template_cylinder.fullMap.shape[2]):
                         if template_cylinder.fullMap[z][y][x] > 0:
                             list_points.append([z, y, x])
-            pca = PCA(np.array(list_points, dtype=np.float64), standardize=False)
-            dic[(rad_in_x, rad_in_y)] = pca.Wt[0]
+            #pca = PCA(np.array(list_points, dtype=np.float64), standardize=False)
+            pca = pc.fit(np.array(list_points, dtype=np.float64))
 
-            prev_pca = pca.Wt[0]
+            dic[(rad_in_x, rad_in_y)] = pca.components_[0]
+
             cylinder_array = gaussian_filter(template_cylinder.fullMap, sigma)
             template_cylinder.fullMap = cylinder_array
             template_cylinder.write_to_MRC_file(directory + "/template{0}_{1}.mrc".format(i, j))

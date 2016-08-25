@@ -77,7 +77,7 @@ def region_pca_parallelism(region, theta=20): #   how to calc angle between pca 
         print "pca problem fuck this shit"
         return False
     for node in region.nodes:
-        if region.pca and angle(node.pca_dir, region.pca.Wt[0])*57.2958 > theta:
+        if region.pca and angle(node.pca_dir, region.pca.components_[0])*57.2958 > theta:
             return False
     print "hallelujah!"
     return True
@@ -127,7 +127,8 @@ def connect(node1, node2):
 
 def connect_regions(node1, node2):
     if node1.region == node2.region:
-        print "shit!"
+        print "tried to connect two similar regions!"
+        return
     r_new = Region()
     r_new.nodes = node1.region.nodes + node2.region.nodes
     if len(r_new.nodes) > 8:
