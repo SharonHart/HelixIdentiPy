@@ -7,6 +7,7 @@ from messages import Messages
 from create_cylinder import cylinder_creation
 from graph import graph_creation
 from linkage import link_regions
+from plot_result import plot_matrix
 import pickle
 from matplotlib.mlab import PCA
 
@@ -47,12 +48,19 @@ def main():
     #
     # with open(dir_path + "/source/graph.p", 'wb') as f:
     #     pickle.dump(graph, f)
-    # 
-    with open(dir_path + "/source/graph.p", 'rb') as g:
+
+    # with open(dir_path + "/source/graph.p", 'rb') as g:
+    #     graph = pickle.load(g)
+
+    #graph=link_regions(graph)
+    #
+    # with open(dir_path + "/source/graph2.p", 'wb') as f:
+    #     pickle.dump(graph, f)
+
+    with open(dir_path + "/source/graph2.p", 'rb') as g:
         graph = pickle.load(g)
 
-    link_regions(graph)
-
+    plot_matrix(graph, target_map.box_size())
 
 if __name__ == "__main__":
     main()

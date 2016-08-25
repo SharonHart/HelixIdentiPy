@@ -56,15 +56,27 @@ def distance_between_points(point_1, point_2):
 def link_regions(graph):
     graph.regions = [region for region in graph.regions if len(region.nodes) >= 8]
     paired_regions = True
-
+    last_unified = 0
     while paired_regions:
         paired_regions = False
         start_over = False
-        for i in range(len(graph.regions)):
+
+        for i in range (0, last_unified):
+            print i, len(graph.regions)-1, len(graph.regions)
+            region_1 = graph.regions[i]
+            last_region = graph.regions[len(graph.regions)-1]
+            if not (angle_satisfiable(region_1, last_region) and distances_satisfaible(region_1, last_region)):
+                continue
+            linked_region = Region.connect(region_1, last_region)
+            if helix_radius_satisfible(linked_region):
+                paired_regions = True
+                graph.regions.remove(region_1)
+                graph.regions.remove(last_region)
+                graph.regions.append(linked_region)
+
+        for i in range(last_unified, len(graph.regions)):
             for j in range(i + 1, len(graph.regions)):
                 print i,j, len(graph.regions)
-                if (i,j, len(graph.regions)) == (12, 24, 40):
-                    pass
 
                 region_1 = graph.regions[i]
                 region_2 = graph.regions[j]
@@ -79,6 +91,7 @@ def link_regions(graph):
                     start_over = True
                     break
             if start_over:
+                last_unified = i
                 break
     return graph
             #     i = 1
