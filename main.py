@@ -44,18 +44,18 @@ def main():
     # compute correlation
     max_score, max_dirs = correlate(target_map)
 
-    # graph = graph_creation(max_score, max_dirs, dic_directions)
-    #
+    graph = graph_creation(max_score, max_dirs, dic_directions)
+
     # with open(dir_path + "/source/graph.p", 'wb') as f:
     #     pickle.dump(graph, f)
-
+    #
     # with open(dir_path + "/source/graph.p", 'rb') as g:
     #     graph = pickle.load(g)
 
-    #graph=link_regions(graph)
+    graph=link_regions(graph)
     #
-    # with open(dir_path + "/source/graph2.p", 'wb') as f:
-    #     pickle.dump(graph, f)
+    with open(dir_path + "/source/graph2.p", 'wb') as f:
+        pickle.dump(graph, f)
 
     with open(dir_path + "/source/graph2.p", 'rb') as g:
         graph = pickle.load(g)
