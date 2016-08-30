@@ -10,4 +10,5 @@ class Messages:
     TEMPLATES_GENERATION_ERROR = "Unable to generate template files."
     CORRELATION_ERROR = "Error correlating Target with template: {}"
     ERROR_READING_TEMPLATE_FILE = "Error reading template file: {}"
-
+    BUMPED_BACK = "Don't be hasty now.. You have some things missing to start this phase, bumping you back for previous phase. \
+    This is for your own good."

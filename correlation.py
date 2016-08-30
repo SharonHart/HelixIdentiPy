@@ -1,24 +1,21 @@
+import os
+
 import numpy as np
 from TEMPy.MapParser import *
 from TEMPy.ScoringFunctions import *
-import os
-
-from matplotlib.mlab import PCA
 
 from messages import Messages
-from checout_matrix import checkitout
-from template_match import template_matching
-from scipy.ndimage.interpolation import shift
 
-from norm_xcorr import norm_xcorr
+# import matlab.engine
+# eng = matlab.engine.start_matlab()
 # from sklearn.cross_decomposition import CCA
 """"Correlates between the target and the generated templates. Returns score matrix and direction matrix"""
 
 corr_dir = "/correlation"
 
+
 def main(target_map):
-    THRESHOLD = 70
-    save_results = False
+    save_results = True
     correlate_either_way = False
 
     print Messages.START_CORRELATION
@@ -75,11 +72,7 @@ def main(target_map):
                     if value > max_scores[x, y, z]:
                         max_scores[x, y, z] = value
                         max_dirs[x, y, z] = (rad_in_x, rad_in_y)
-                        # print value
-                        if value >=THRESHOLD:
-                            values_above_thr_counter += 1
-                #         if value > 100:
-                #             print "no good"
+
             except Exception as e:
                 print e
                 print Messages.CORRELATION_ERROR.format(template_name)
@@ -99,13 +92,3 @@ def main(target_map):
         dirs_file.close()
         # checkitout()
     return max_scores, max_dirs
-
-def local_sum(I, t):
-    t_size = np.shape(t)
-# % 3D Localsum
-    s = np.cumsum(I, 0)
-    c = s[1 + t_size[0]:- 2,:,:]-s[1:-1 - t_size[0] - 1,:,:]
-    s = np.cumsum(I, 1)
-    c = s[:1 + t_size[1]:- 2, :, :] - s[1:-1 - t_size[1] - 1, :, :]
-    s = np.cumsum(I, 2)
-    return s[:,:, 1 + t_size[2]:-1 - 1]-s[:,:, 1:-1 - t_size[2] - 1]

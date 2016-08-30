@@ -43,7 +43,7 @@ def cylinder_creation(path):
     dz = len(map_target.fullMap) * map_target.apix / 2
     dy = len(map_target.fullMap[0]) * map_target.apix / 2
     dx = len(map_target.fullMap[0][0]) * map_target.apix / 2
-    points_array = []
+    # points_array = []
     for z in range(len(map_target.fullMap)):
         for y in range(len(map_target.fullMap[z])):
             for x in range(len(map_target.fullMap[z][y])):
@@ -53,13 +53,11 @@ def cylinder_creation(path):
 
                 if (z_coor < h) & (z_coor > 0) & (y_coor * y_coor + x_coor * x_coor < dr * dr):
                     map_target.fullMap[z][y][x] = rho
-                    points_array.append([z,y,x])
+                    # points_array.append([z,y,x])
                 else:
                     map_target.fullMap[z][y][x] = 0
 
     map_target.write_to_MRC_file(path_out + 'Cylinder.mrc')
 
 
-    pca = PCA(np.array(points_array, dtype=np.float64), standardize=False)
-    print "bla"
-    print pca.Wt[0]
+    # pca = PCA(np.array(points_array, dtype=np.float64), standardize=False)

@@ -104,7 +104,7 @@ def template_matching_gray(T, I):
 
     stdT = np.dot(np.sqrt((np.size(T) - 1.)), np.std(T.flatten(1)))
     # % Mean compensation
-    meanIT = np.divide(np.dot(LocalSumI, np.sum(T.flatten(1))), np.size(T))
+    meanIT = np.divide(np.dot(LocalSumI, np.sum(T.flatten())))#, np.size(T))
     I_NCC = 0.5 + (Icorr - meanIT) / np.dot(2. * stdT, max((stdI), np.divide(stdT, 1e5)))
     # % Remove padding
     I_NCC = unpadarray(I_NCC, matcompat.size(I))
@@ -136,10 +136,15 @@ def local_sum(I, T):
     T_size = [60,60,60]
     B = I
     s = np.cumsum(B, 0)
+    print s
     c = s[int(1. + T_size[0]) - 1:0 - 1., :, :] - s[0:0 - T_size[0] - 1., :, :]
+    print c
     s = np.cumsum(c, 1)
+    print s
     c = s[:, int(1. + T_size[1]) - 1:0 - 1., :] - s[:, 0:0 - T_size[1] - 1., :]
     s = np.cumsum(c, 2)
+
+    print s
     local_sum_I = s[:, :, int(1. + T_size[2]) - 1:0 - 1.] - s[:, :, 0:0 - T_size[2] - 1.]
 
 

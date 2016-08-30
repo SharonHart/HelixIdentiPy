@@ -8,12 +8,15 @@ from classes import *
 graph = Graph()
 directions = None
 scores = None
+theta = math.pi / 9
 
 APIX = None
 
-def graph_creation(score_matrix, max_dir, dic_directions, apix, THRESHOLD=None):
+def graph_creation(score_matrix, max_dir, dic_directions,theta_arg, apix, THRESHOLD=None):
     global APIX
     APIX = apix
+    global theta
+    theta = theta_arg
     if not THRESHOLD:
         N = 8000
         THRESHOLD = np.percentile(score_matrix, 100 - ((float(N) / score_matrix.size) * 100))

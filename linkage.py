@@ -52,9 +52,15 @@ def distance_between_points(point_1, point_2):
     return np.linalg.norm(point_1 - point_2)
 
 
-def link_regions(graph, apix):
+def link_regions(graph, theta, mid, line, apix):
+    global ANGLE_BETWEEN_REGIONS
+    ANGLE_BETWEEN_REGIONS = theta
     global APIX
     APIX = apix
+    global MID_DIST_DEFAULT
+    MID_DIST_DEFAULT = mid
+    global LINE_DIST_DEFAULT
+    LINE_DIST_DEFAULT=line
     graph.regions = [region for region in graph.regions if len(region.nodes) >= 8]
     paired_regions = True
     last_unified = 0

@@ -1,13 +1,15 @@
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 import numpy as np
+
 """
 2d picture, not very informative
 """
+
+
 def plot_matrix2(graph, target_size):
     plt.clf()
-    out_file_name = "./rainbow_pic"  + ".png"
+    out_file_name = "./rainbow_pic" + ".png"
 
     colors = []
     points = []
@@ -63,12 +65,17 @@ def plot_matrix2(graph, target_size):
 
     plt.figure(figsize=(30, 30))
     plt.show()
+
+
 """
 3d picture of resulted regions and their nodes
 """
+
+
 def plot_matrix(graph, target_size):
     plt.clf()
-    fig = plt.figure()
+    fig = plt.figure(figsize=(30, 30))
+
     ax = fig.add_subplot(111, projection='3d')
 
     colors = []
@@ -102,7 +109,6 @@ def plot_matrix(graph, target_size):
     c_all = c
     # s_all = np.concatenate((s_all, s), axis=0)
 
-    plt.figure(figsize=(30, 30))
     plt.tick_params(axis='both', which='major', labelsize=55)
 
     ax.scatter(x_all, y_all, z_all, c=c_all, alpha=0.5)
@@ -112,7 +118,6 @@ def plot_matrix(graph, target_size):
     ax.set_ylabel('Y Label')
     ax.set_zlabel('Z Label')
     # plt.savefig("3d_plot.png")
-
     plt.show()
     # plt.savefig(out_file_name)
     #
