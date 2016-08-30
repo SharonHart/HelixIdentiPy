@@ -9,7 +9,6 @@ from graph import graph_creation
 from linkage import link_regions
 from plot_result import plot_matrix
 import pickle
-from matplotlib.mlab import PCA
 
 
 def main():
@@ -38,21 +37,23 @@ def main():
     #except:
     #    print Messages.INPUT_FILES_ERROR
 
+    apix = target_map.apix
+
     # generate templates
     dic_directions = create_templates(target_map, cylinder_map, overwrite=False)
 
     # compute correlation
     max_score, max_dirs = correlate(target_map)
 
-    graph = graph_creation(max_score, max_dirs, dic_directions)
-
+    # graph = graph_creation(max_score, max_dirs, dic_directions, apix)
+    #
     # with open(dir_path + "/source/graph.p", 'wb') as f:
     #     pickle.dump(graph, f)
-    #
-    # with open(dir_path + "/source/graph.p", 'rb') as g:
-    #     graph = pickle.load(g)
 
-    graph=link_regions(graph)
+    with open(dir_path + "/source/graph.p", 'rb') as g:
+        graph = pickle.load(g)
+
+    graph=link_regions(graph, apix)
     #
     with open(dir_path + "/source/graph2.p", 'wb') as f:
         pickle.dump(graph, f)

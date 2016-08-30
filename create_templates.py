@@ -1,6 +1,5 @@
 import numpy as np
 from TEMPy.ScoringFunctions import *
-#from matplotlib.mlab import PCA
 from sklearn.decomposition import PCA
 from scipy.ndimage.filters import gaussian_filter
 import os

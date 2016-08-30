@@ -1,5 +1,7 @@
 import random
 
+import math
+
 from classes import *
 
 # create graph instance
@@ -7,10 +9,16 @@ graph = Graph()
 directions = None
 scores = None
 
-def graph_creation(score_matrix, max_dir, dic_directions, THRESHOLD=87):
+APIX = None
 
-    scores = score_matrix
-    directions = max_dir
+def graph_creation(score_matrix, max_dir, dic_directions, apix, THRESHOLD=None):
+    global APIX
+    APIX = apix
+    if not THRESHOLD:
+        N = 8000
+        THRESHOLD = np.percentile(score_matrix, 100 - ((float(N) / score_matrix.size) * 100))
+    if 0 < THRESHOLD <= 1:
+        score_matrix /= score_matrix.max()
     if len(score_matrix)<3 or len(max_dir) < 3:
         print "no good"
 
@@ -26,11 +34,6 @@ def graph_creation(score_matrix, max_dir, dic_directions, THRESHOLD=87):
             graph.regions.append(region)
 
     # foreach pair of nodes check if they should be connected and appended to region todo:  this is a naive impl change for a better one
-    # for node1 in graph.nodes:
-    #     for node2 in graph.nodes:
-    #         if node1 == node2: pass
-    #         if should_connect(node1, node2):
-    #             connect(node1, node2)
     for i in range(len(graph.nodes)):
         node1 = graph.nodes[i]
         for j in range(i+1, len(graph.nodes)):
@@ -39,6 +42,8 @@ def graph_creation(score_matrix, max_dir, dic_directions, THRESHOLD=87):
                 print i,j
                 connect(node1, node2)
     return graph
+
+
 def is_neighbours(node1, node2):
     return (node1.voxel[0] - node2.voxel[0] >= -1 and node1.voxel[0] - node2.voxel[0] <= 1) and \
             (node1.voxel[1] - node2.voxel[1] >= -1 and node1.voxel[1] - node2.voxel[1] <= 1) and \
@@ -62,7 +67,7 @@ def theta_parallel(node1, node2, theta):
 
 
 def pairwise_region_parallelism(region1, region2, theta):
-    for  node1 in region1.nodes: # todo  this is naive
+    for node1 in region1.nodes: # todo  this is naive
         for node2 in region2.nodes:
             if not theta_parallel(node1, node2, theta): return False
     return True
@@ -100,7 +105,24 @@ def is_theta_parallel(node1, node2, theta=20):
         return region_pca_parallelism(r_new)
 
 def is_predicate_verified(node1, node2): #todo
-    return True if random.random() > 0.5 else False
+    r1 = node1.region
+    r2 = node2.region
+
+    # same region
+    if r1 == r2: return False
+
+    # regions are small - still no PCA
+    if (len(r1.nodes) + len(r2.nodes)) <= 8:
+        return True
+
+    # need to check pca
+    else:
+        new_region = Region()
+        new_region.nodes = r1.nodes + r2.nodes
+        new_region.calc_pca()
+        lambda_1, lambda_2, lambda_3 = tuple(new_region.eigenvalues)
+        return math.sqrt(lambda_2) <= 3.5/APIX and math.sqrt(lambda_3) <= 3.5/APIX
+
 
 
 def should_connect(node1, node2):

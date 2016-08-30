@@ -7,14 +7,15 @@ from scipy.spatial import distance
 
 
 ANGLE_BETWEEN_REGIONS = math.pi / 9
-MID_DIST_DEFAULT = 10
+MID_DIST_DEFAULT = 100000000000
 LINE_DIST_DEFAULT = 10
 
+APIX = None
 
 def helix_radius_satisfible(region):
     region.calc_pca()
     lambda1, lambda2 = region.eigenvalues[1], region.eigenvalues[2]
-    return math.sqrt(lambda1) <= 3.5 and math.sqrt(lambda2) <= 3.5
+    return math.sqrt(lambda1) <= 3.5/APIX and math.sqrt(lambda2) <= 3.5/APIX
 
 
 def angle_satisfiable(region_1, region_2):
@@ -29,9 +30,7 @@ def angle_satisfiable(region_1, region_2):
 
 
 def midpoint_distance(region_1, region_2):
-    mean_1 = np.array([node.voxel for node in region_1.nodes]).mean()
-    mean_2 = np.array([node.voxel for node in region_2.nodes]).mean()
-    return distance_between_points(mean_1, mean_2)
+    return distance_between_points(region_1.pca.mean_, region_2.pca.mean_)
 
 
 def line_distance(region_1, region_2):
@@ -39,21 +38,23 @@ def line_distance(region_1, region_2):
 
     for node_1 in region_1.nodes:
         for node_2 in region_2.nodes:
-            dist = distance_between_points(node_1.voxel, node_2.voxel)
+            dist = distance_between_points(np.array(node_1.voxel), np.array(node_2.voxel))
             if dist < min_dist:
                 min_dist = dist
     return min_dist
 
 
 def distances_satisfaible(region_1, region_2):
-    return midpoint_distance(region_1, region_2) < MID_DIST_DEFAULT and line_distance(region_1, region_2) < LINE_DIST_DEFAULT
+    return midpoint_distance(region_1, region_2) < MID_DIST_DEFAULT/APIX and line_distance(region_1, region_2) < LINE_DIST_DEFAULT/APIX
 
 
 def distance_between_points(point_1, point_2):
-    dist = np.linalg.norm(np.array(point_1) - np.array(point_2))
+    return np.linalg.norm(point_1 - point_2)
 
 
-def link_regions(graph):
+def link_regions(graph, apix):
+    global APIX
+    APIX = apix
     graph.regions = [region for region in graph.regions if len(region.nodes) >= 8]
     paired_regions = True
     last_unified = 0
@@ -61,7 +62,7 @@ def link_regions(graph):
         paired_regions = False
         start_over = False
 
-        for i in range (0, last_unified):
+        for i in range(0, last_unified):
             print i, len(graph.regions)-1, len(graph.regions)
             region_1 = graph.regions[i]
             last_region = graph.regions[len(graph.regions)-1]
@@ -94,37 +95,3 @@ def link_regions(graph):
                 last_unified = i
                 break
     return graph
-            #     i = 1
-#     while continue_scanning:
-#         print "entering loop" + str(i)
-#         i = i+1
-#         regionsss = graph.regions[:]
-#         print "size of regions " + str(len(regionsss))
-#         to_remove = []
-#         to_add = []
-#         keep_it = False
-#         for i in range(len(graph.regions)):
-#             for j in range(i+1, len(graph.regions)):
-#                 linked_region = Region()
-#                 region_1 = regionsss[i]
-#                 region_2 = regionsss[j]
-#                 linked_region.nodes = region_1.nodes + region_2.nodes
-#                 if helix_radius_satisfible(linked_region) \
-#                         and angle_satisfiable(region_1, region_2) \
-#                         and distances_satisfaible(region_1, region_2):
-#                     print "found two regions to connect by linkage"
-#                     to_remove.append(region_1)
-#                     to_remove.append(region_2)
-#                     to_add.append(connect_regions(region_1.nodes[0], region_2.nodes[0])
-# )
-#                     keep_it = True
-#         if not keep_it: continue_scanning = False
-#         for r in to_remove:
-#             graph.remove_region(r)
-#         for r in to_add:
-#             graph.regions.append(r)
-#     return graph
-                # for region_1 in graph.regions:
-    #     for region_2 in graph.regions:
-    #         if region_1 != region_2:
-
