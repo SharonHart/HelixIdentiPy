@@ -18,8 +18,8 @@ corr_dir = "/correlation"
 
 def main(target_map):
     THRESHOLD = 70
-    save_results = False
-    correlate_either_way = False
+    save_results = True
+    correlate_either_way = True
 
     print Messages.START_CORRELATION
     dir_path = os.path.dirname(os.path.realpath(__file__))
