@@ -11,12 +11,12 @@ from messages import Messages
 # from sklearn.cross_decomposition import CCA
 """"Correlates between the target and the generated templates. Returns score matrix and direction matrix"""
 
+save_results = True
+correlate_either_way = False
 corr_dir = "/correlation"
 
 
 def main(target_map):
-    save_results = True
-    correlate_either_way = False
 
     print Messages.START_CORRELATION
     dir_path = os.path.dirname(os.path.realpath(__file__))
