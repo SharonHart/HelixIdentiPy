@@ -1,0 +1,20 @@
+-= HelixIdentiPy - Find Helicies! =-
+
+Runs on Python 2.7
+
+Python packages required:
+
+Installed using OS package management (i.e. apt-get for Ubuntu based OS):
+1. Python-dev
+2. TkInter
+command: sudo apt-get install python-dev python-tk, python-imaging-tk
+
+Installed using pip version 8.12:
+1. Numpy
+2. Scipy
+3. Biopython
+4. Sklearn
+5. matplotlib
+command: sudo pip install numpy scipy biopython sklearn matplotlib
+
+On time of publish, all packages worked on their latest release

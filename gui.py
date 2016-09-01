@@ -1,12 +1,11 @@
 from Tkinter import *
-from Tkinter import Tk
 from main import main as main_go
 from PIL import Image, ImageTk
 import tkFileDialog
 import ttk
-pic_path = "helix.jpg"
-fields = ('Threshold', 'Theta (degrees)', 'Midpoint Distance (angstrom)', 'Line Distance (angstrom)', 'Start at stage:')
-
+pic_path = "UI/logo.jpg"
+fields = ('Threshold', 'Theta (degrees)', 'Midpoint Distance (angstrom)', 'Line Distance (angstrom)', 'Start at stage', 'Choose a MAP file')
+input_path = None
 
 def get_start(value):
     if value == "start":
@@ -29,12 +28,11 @@ def gogo(entries):
     theta = (int(entries['Theta (degrees)'].get()))
     mid = (int(entries['Midpoint Distance (angstrom)'].get())) #todo
     line = (int(entries['Line Distance (angstrom)'].get())) #todo
-    start = get_start(entries['Start at stage:'].get())
-    path = tkFileDialog.askopenfilename()
-    print(path)
+    start = get_start(entries['Start at stage'].get())
+
     # messagebox.showinfo("Work in progress",
     #                     "Please wait till' it's done... You'll get a message (for now just click OK).")
-    main_go(thresh, theta, mid, line, start, path)
+    main_go(thresh, theta, mid, line, start, input_path)
     # messagebox.showinfo("Work is DONE!", "You may now enter another session folder.")
 
 
@@ -60,6 +58,9 @@ def makeform(root, fields):
             ent = ttk.Combobox(row)
             ent['values'] = ('start', 'after_templates','after_correlation', 'after_graph', 'just_plot')
             ent.insert(0, "start")
+        elif cntr == 5:
+            ent.insert(0, "")
+
         row.pack(side=TOP, fill=X, padx=5, pady=5)
         lab.pack(side=LEFT)
         ent.pack(side=RIGHT, expand=YES, fill=X)
@@ -67,24 +68,35 @@ def makeform(root, fields):
         cntr += 1
     return entries
 
+
+def choose_file(e):
+    global input_path
+    input_path = tkFileDialog.askopenfilename()
+    print "Reading File: " + input_path
+
+
 def main():
     root = Tk()
     root.wm_title("HelixIdentiPy (ver 0.1) - Find helices!")
     img = Image.open(pic_path)
     photo = ImageTk.PhotoImage(img)
 
-    right_panel = Frame(root)
-    left_panel = Frame(root)
+    top_panel = Frame(root)
+    botoom_panel = Frame(root)
 
-    panel = Label(right_panel, image=photo)
-    panel.pack(side=BOTTOM, fill="both", expand="yes")
+    panel = Label(top_panel, image=photo)
+    panel.pack(side=TOP, fill="both", expand="yes")
 
-    ents = makeform(left_panel, fields)
-    b2 = Button(left_panel, text='GO!', command=(lambda e=ents: gogo(e)))
-    b2.pack(side=BOTTOM, padx=5, pady=5)
+    ents = makeform(botoom_panel, fields)
 
-    left_panel.pack(side=LEFT)
-    right_panel.pack(side=RIGHT, expand="yes")
+    path_botton = Button(botoom_panel, text="Browse...", command=(lambda e=ents: choose_file(e)))
+    path_botton.pack(padx=5, pady=5)
+
+    b2 = Button(botoom_panel, text='GO!', command=(lambda e=ents: gogo(e)))
+    b2.pack(side=TOP, padx=0, pady=0)
+
+    top_panel.pack(side=TOP)
+    botoom_panel.pack(side=BOTTOM, expand="yes")
 
     # root.iconbitmap(r'helixico.ico')
     # root.iconname('helixico.ico')

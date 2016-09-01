@@ -1,5 +1,4 @@
 import os
-import sys
 from TEMPy.MapParser import *
 from create_templates import main as create_templates
 from correlation import main as correlate
