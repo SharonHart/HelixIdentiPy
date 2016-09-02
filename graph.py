@@ -19,8 +19,6 @@ def graph_creation(score_matrix, max_dir, dic_directions,theta_arg, apix, THRESH
         THRESHOLD = np.percentile(score_matrix, 100 - ((float(N) / score_matrix.size) * 100))
     if 0 < THRESHOLD <= 1:
         score_matrix /= score_matrix.max()
-    if len(score_matrix)<3 or len(max_dir) < 3:
-        print "no good"
 
     # create nodes that are above threshold
     # create region foreach new node
@@ -63,8 +61,6 @@ def angle(v1, v2):
 
 
 def theta_parallel(node1, node2, theta):
-    # v1 = np.append(node1.direction, [1])
-    # v2 = np.append(node2.direction, [1])
     return angle(node1.pca_dir, node2.pca_dir)*57.2958 <= theta
 
 
@@ -75,18 +71,16 @@ def pairwise_region_parallelism(region1, region2, theta):
     return True
 
 
-def region_pca_parallelism(region, theta=20): #   how to calc angle between pca and nodes direction
+def region_pca_parallelism(region, theta=20):
     if len(region.nodes) == 0:
         pass
     try:
         region.calc_pca()
     except Exception as e:
-        print "pca problem fuck this shit"
         return False
     for node in region.nodes:
         if region.pca and angle(node.pca_dir, region.pca.components_[0])*57.2958 > theta:
             return False
-    print "hallelujah!"
     return True
 
 def is_theta_parallel(node1, node2, theta=20):
@@ -134,8 +128,6 @@ def should_connect(node1, node2):
 def connect(node1, node2):
     edge = (node1, node2)
     graph.edges.append(edge)
-    if node1.region == node2.region:
-        print "shit!"
     graph.remove_region(node1.region)
     graph.remove_region(node2.region)
     r_new = Region()
@@ -144,22 +136,21 @@ def connect(node1, node2):
     if len(r_new.nodes) > 8:
         try:
             r_new.calc_pca()
-        except Exception as e:
-            print "pca problem fuck this shit22222"
+        except Exception:
+            print "pca problem"
     for node in r_new.nodes:
         node.region = r_new
 
 def connect_regions(node1, node2):
     if node1.region == node2.region:
-        print "tried to connect two similar regions!"
         return
     r_new = Region()
     r_new.nodes = node1.region.nodes + node2.region.nodes
     if len(r_new.nodes) > 8:
         try:
             r_new.calc_pca()
-        except Exception as e:
-            print "pca problem fuck this shit22222"
+        except Exception:
+            print "pca problem"
     for node in r_new.nodes:
         node.region = r_new
     return r_new
