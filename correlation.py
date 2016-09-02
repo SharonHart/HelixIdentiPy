@@ -12,7 +12,7 @@ from messages import Messages
 """"Correlates between the target and the generated templates. Returns score matrix and direction matrix"""
 
 save_results = True
-correlate_either_way = False
+correlate_either_way = True
 corr_dir = "/correlation"
 
 

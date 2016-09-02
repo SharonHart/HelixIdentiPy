@@ -38,6 +38,7 @@ class Region:
         self.nodes = []
         self.pca = None
         self.eigenvalues = None
+        self.id = 0
 
     def add_node(self, node):
         self.nodes.append(node)
