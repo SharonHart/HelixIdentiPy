@@ -1,8 +1,9 @@
 import os
 import sys
 
+import global_vars
 from messages import Messages
-from gui import main as gui
+from gui_class import main as gui
 from main import main as main_go
 
 # command is either:
@@ -12,8 +13,8 @@ def main():
 
     threshold = None
     theta = 20
-    mid = 13
-    line = 4
+    mid = 1300
+    line = 400
     phase = 0
 
     if len(sys.argv) < 2:
