@@ -6,7 +6,7 @@ from TEMPy.MapParser import *
 from messages import Messages
 from create_templates import main as create_templates
 from correlation import main as correlate
-from create_cylinder import main as cylinder_creation
+from create_cylinder import main as create_cylinder
 from graph import main as graph_creation
 from linkage import main as link_regions
 from plot_result import main as plot_matrix
@@ -83,21 +83,20 @@ def main(thresh, theta, mid, line, start, target_path):
     if not os.path.exists(templates_dir):
         os.makedirs(templates_dir)
 
-    # Create the ideal cylinder.
-    set_status(Messages.START_CYL)
-    cylinder_creation(target_path, output_path=source_dir + "Cylinder.mrc")
-    set_status(Messages.END_CYL)
-
-    # Read map files
+    # Read the target map file.
     try:
         target_map = MapParser.readMRC(target_path)
-        cylinder_map = MapParser.readMRC(source_dir + "Cylinder.mrc")
-    except:
+        apix = target_map.apix  # Target map resolution
+    except Exception as e:
        print Messages.INPUT_FILES_ERROR
 
-    apix = target_map.apix  # Target map resolution
+    # Create the ideal cylinder.
+    set_status(Messages.START_CYL)
+    cylinder_map = create_cylinder(target_map)
+    cylinder_map.write_to_MRC_file(source_dir + "Cylinder.mrc")
+    set_status(Messages.END_CYL)
 
-    if start < 1 or not (len(os.listdir(templates_dir)) >= 144):
+    if start < 1 or len(os.listdir(templates_dir)) < 144:
         # Generate templates
         dic_directions = run_templates(target_map, cylinder_map, overwrite=True)
     else:
