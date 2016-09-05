@@ -7,7 +7,7 @@ import numpy as np
 3d picture of resulted regions and their nodes
 """
 
-def plot_matrix(graph, target_size):
+def main(graph, target_size):
     plt.clf()
     fig = plt.figure(figsize=(30, 30))
 

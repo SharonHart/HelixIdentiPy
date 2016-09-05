@@ -67,5 +67,5 @@ def main(target_map, cylinder_map, overwrite=False):
 
             sanity += 1
     print Messages.DONE_TEMPLATES.format(sanity)
-    pickle.dump(dic, open(dir_path + "/correlation/dir_directions.p", 'wb'))
+    pickle.dump(dic, open(dir_path + "/source" + "/dir_directions.p", 'wb'))
     return dic

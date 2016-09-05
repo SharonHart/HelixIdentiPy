@@ -13,16 +13,18 @@ from messages import Messages
 
 save_results = True
 correlate_either_way = True
-corr_dir = "/correlation"
 
 
 def main(target_map):
 
-    print Messages.START_CORRELATION
-    dir_path = os.path.dirname(os.path.realpath(__file__))
 
-    if not correlate_either_way and os.path.isfile(dir_path + "/correlation" + "/max_score"):
-        return np.load(dir_path + "/correlation" + "/max_score"), np.load(dir_path + "/correlation" + "/max_dirs")
+    print Messages.START_CORRELATION
+
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    corr_dir = dir_path + "/source/"
+
+    if not correlate_either_way and os.path.isfile(corr_dir + "/max_score"):
+        return np.load(corr_dir + "/max_score"), np.load(corr_dir + "/max_dirs")
     max_scores = np.zeros(target_map.box_size())
     max_dirs = np.zeros(target_map.box_size(), dtype=(float, 2))
     dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -81,11 +83,9 @@ def main(target_map):
     if save_results:
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        if not os.path.exists(dir_path + corr_dir):
-            os.makedirs(dir_path + corr_dir)
 
-        score_file = open(dir_path + corr_dir + "/max_score", "w+")
-        dirs_file = open(dir_path + corr_dir + "/max_dirs", "w+")
+        score_file = open(dir_path + "/source"+ "/max_score", "w+")
+        dirs_file = open(dir_path + "/source" + "/max_dirs", "w+")
         np.save(score_file, max_scores)
         np.save(dirs_file, max_dirs)
         score_file.close()

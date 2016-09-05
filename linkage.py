@@ -52,7 +52,7 @@ def distance_between_points(point_1, point_2):
     return np.linalg.norm(point_1 - point_2)
 
 
-def link_regions(graph, theta, mid, line, apix):
+def main(graph, theta, mid, line, apix):
     global ANGLE_BETWEEN_REGIONS
     ANGLE_BETWEEN_REGIONS = theta
     global APIX
