@@ -112,7 +112,7 @@ def main(thresh, theta, mid, line, start, target_path):
 
 
 
-    if start < 2 or (not (os.path.isfile(source_dir + "/max_score"))):
+    if start < 2 or (not (os.path.isfile(source_dir + "max_score"))):
         try:
             # compute correlation
             set_status(Messages.START_CORRELATION)
@@ -126,7 +126,7 @@ def main(thresh, theta, mid, line, start, target_path):
         graph = run_graph(theta, apix, THRESHOLD=thresh)
     else:
         try:
-            with open(source_dir + "/graph.p", 'rb') as g:
+            with open(source_dir + "graph.p", 'rb') as g:
                 graph = pickle.load(g)
         except IOError:
             graph = run_graph(theta,apix, THRESHOLD=thresh)
@@ -140,7 +140,7 @@ def main(thresh, theta, mid, line, start, target_path):
         graph2 = run_linkage(theta, mid, line, apix)
     else:
         try:
-            with open(source_dir + "/graph2.p", 'rb') as g:
+            with open(source_dir + "graph2.p", 'rb') as g:
                 graph2 = pickle.load(g)
         except IOError:
             graph2 = run_linkage(theta, mid, line, apix)
