@@ -1,5 +1,5 @@
 """
-This holds the various classes and data structures.
+Holds the various classes and data structures.
 Used by the algorithm graphs creation and manipulation
 """
 

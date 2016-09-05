@@ -1,11 +1,11 @@
+"""
+3D graph plot, showing the resulted regions, in different colors.
+"""
+
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D  # DO NOT REMOVE THIS LINE
+from mpl_toolkits.mplot3d import Axes3D  # DO NOT REMOVE THIS LINE. This allows to plot when in GUI mode
 import numpy as np
 
-
-"""
-3d picture of resulted regions and their nodes
-"""
 
 def main(graph, target_size):
     plt.clf()

@@ -1,3 +1,6 @@
+"""
+DEPRICATED.
+"""
 from TEMPy.MapParser import *
 from TEMPy.ScoringFunctions import *
 from TEMPy.StructureBlurrer import *

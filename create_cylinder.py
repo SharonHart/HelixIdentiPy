@@ -1,8 +1,6 @@
-# ===========================================================================================
-# This example read a density map and performs operations such as translation, rotation, etc.
-# ===========================================================================================
-
-from TEMPy.MapParser import MapParser
+"""
+Creates an ideal cylinder in a map file format.
+"""
 
 def main(target_map):
 
@@ -16,7 +14,7 @@ def main(target_map):
     dz = len(target_map.fullMap) * target_map.apix / 2
     dy = len(target_map.fullMap[0]) * target_map.apix / 2
     dx = len(target_map.fullMap[0][0]) * target_map.apix / 2
-    # points_array = []
+
     for z in range(len(target_map.fullMap)):
         for y in range(len(target_map.fullMap[z])):
             for x in range(len(target_map.fullMap[z][y])):

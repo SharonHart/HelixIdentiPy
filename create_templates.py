@@ -1,15 +1,16 @@
+"""
+Generates templates originated by rotating an ideal cylinder in the xy plane.
+By default, the algorithm suggests rotating 12 times in each axis, resulting in 144 templates
+TODO: Smooth templated!!
+"""
+
 import numpy as np
+import os
+import pickle
 from TEMPy.ScoringFunctions import *
 from sklearn.decomposition import PCA
 from scipy.ndimage.filters import gaussian_filter
-import os
-import pickle
-from graph import angle
-from scipy.ndimage.interpolation import rotate
-
-
 from messages import Messages
-""""generates templates"""
 
 
 def main(target_map, cylinder_map, overwrite=False):

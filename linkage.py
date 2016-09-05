@@ -1,9 +1,9 @@
-import numpy as np
-import copy
+"""
+TODO: MID_DIST_DEFAULT and LINE_DIST_DEFAULT???
+"""
 from classes import *
 from graph import angle
 import math
-from scipy.spatial import distance
 
 
 ANGLE_BETWEEN_REGIONS = math.pi / 9

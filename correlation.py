@@ -1,22 +1,19 @@
-import os
+""""
+Correlates between the target map and the generated templates.
+Returns a score matrix and a direction matrix holding the best directions f.e. voxel
+"""
 
+import os
 import numpy as np
 from TEMPy.MapParser import *
 from TEMPy.ScoringFunctions import *
-
 from messages import Messages
-
-# import matlab.engine
-# eng = matlab.engine.start_matlab()
-# from sklearn.cross_decomposition import CCA
-""""Correlates between the target and the generated templates. Returns score matrix and direction matrix"""
 
 save_results = True
 correlate_either_way = True
 
 
 def main(target_map):
-
 
     print Messages.START_CORRELATION
 
