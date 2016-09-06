@@ -1,9 +1,9 @@
-"""
-TODO: MID_DIST_DEFAULT and LINE_DIST_DEFAULT???
-"""
+import numpy as np
+import copy
 from classes import *
 from graph import angle
 import math
+from scipy.spatial import distance
 
 
 ANGLE_BETWEEN_REGIONS = math.pi / 9
@@ -52,7 +52,7 @@ def distance_between_points(point_1, point_2):
     return np.linalg.norm(point_1 - point_2)
 
 
-def main(graph, theta, mid, line, apix):
+def link_regions(graph, theta, mid, line, apix):
     global ANGLE_BETWEEN_REGIONS
     ANGLE_BETWEEN_REGIONS = theta
     global APIX

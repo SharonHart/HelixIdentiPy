@@ -9,7 +9,7 @@ theta = math.pi / 9
 
 APIX = None
 
-def main(score_matrix, max_dir, dic_directions,theta_arg, apix, THRESHOLD=None):
+def graph_creation(score_matrix, max_dir, dic_directions,theta_arg, apix, THRESHOLD=None):
     global APIX
     APIX = apix
     global theta

@@ -1,24 +1,25 @@
 import os
-import global_vars
-import pickle
-import numpy as np
 from TEMPy.MapParser import *
-from messages import Messages
+
+import global_vars
+import messages
 from create_templates import main as create_templates
 from correlation import main as correlate
-from create_cylinder import main as create_cylinder
-from graph import main as graph_creation
-from linkage import main as link_regions
-from plot_result import main as plot_matrix
+from messages import Messages
+from create_cylinder import cylinder_creation
+from graph import graph_creation
+from linkage import link_regions
+from plot_result import plot_matrix
+import pickle
 from pruning import main as pruning
-
+from matplotlib.mlab import PCA
+import numpy as np
 dir_path = os.path.dirname(os.path.realpath(__file__))
-source_dir = dir_path + "/source/"
-templates_dir = dir_path + "/Templates/"
+
 
 def run_linkage(theta, mid, line, apix):
     try:
-        with open(source_dir + "/graph.p", 'rb') as g:
+        with open(dir_path + "/source/graph.p", 'rb') as g:
             graph_prev = pickle.load(g)
         set_status(Messages.START_LINK)
         graph=link_regions(graph_prev, theta, mid, line, apix)
@@ -32,14 +33,14 @@ def run_linkage(theta, mid, line, apix):
 
 def run_graph(theta,apix, THRESHOLD):
     try:
-        scores = np.load(source_dir + "/max_score")
-        directions = np.load(source_dir + "/max_dirs")
-        with open(source_dir + "/dir_directions.p", 'rb') as g:
+        scores = np.load(dir_path + "/correlation/max_score")
+        directions = np.load(dir_path + "/correlation/max_dirs")
+        with open(dir_path + "/correlation/dir_directions.p", 'rb') as g:
             dic_direct = pickle.load(g)
         set_status(Messages.START_GRAPH)
         graph = graph_creation(scores, directions, dic_direct, theta,apix, THRESHOLD=THRESHOLD)
         set_status(Messages.END_GRAPH)
-        with open(source_dir + "/graph.p", 'wb') as f:
+        with open(dir_path + "/source/graph.p", 'wb') as f:
             pickle.dump(graph, f)
         return graph
     except IOError:
@@ -55,7 +56,6 @@ def run_templates(target_map, cylinder_map, overwrite):
     # except IOError:
     #     return None
 
-
 def set_status(stat):
     if global_vars.isGui:
         global_vars.status_bar.set(stat)
@@ -63,56 +63,50 @@ def set_status(stat):
         print stat
 
 
-def main(thresh, theta, mid, line, start, target_path):
-    """ Calls the main algorithm stages
-    :param thresh: Threshold for adding voxels as nodes in the regional graph
-    :param theta: The allowed angle between two graph nodes
-    :param mid: Midpoint distance for the linkage stage
-    :param line: Line distance for the linkage stage
-    :param start: Algorithm start point for parameters changing during run
-           0: all, 1:after create template, 2:after correlation, 3: after graph, 4: just plot
-    :param target_path: Path for the target map file
-    :return: Method. Plots the resulted graph and matrix
-    """
+def main(thresh, theta, mid, line, start, path):
 
+    #start = 0: all 1:after create template 2:after correlation 3: after graph 4: just plot
+
+    # # read input files
     set_status(Messages.START_RUN)
-
-    # Create projects directories for intermidiate file savings
-    if not os.path.exists(source_dir):
-        os.makedirs(source_dir)
-    if not os.path.exists(templates_dir):
-        os.makedirs(templates_dir)
-
-    # Read the target map file.
-    try:
-        target_map = MapParser.readMRC(target_path)
-        apix = target_map.apix  # Target map resolution
-    except Exception as e:
-       print Messages.INPUT_FILES_ERROR
-
-    # Create the ideal cylinder.
+    target_path = path
+    #
     set_status(Messages.START_CYL)
-    cylinder_map = create_cylinder(target_map)
-    cylinder_map.write_to_MRC_file(source_dir + "Cylinder.mrc")
+    cylinder_creation(target_path)
     set_status(Messages.END_CYL)
 
-    if start < 1 or len(os.listdir(templates_dir)) < 144:
-        # Generate templates
+    ideal_cyl = dir_path + "/source/Cylinder.mrc"
+    if not os.path.exists(dir_path + "/correlation"):
+        os.makedirs(dir_path + "/correlation")
+    if not os.path.exists(dir_path + "/Templates"):
+        os.makedirs(dir_path + "/Templates")
+    try:
+        target_map = MapParser.readMRC(target_path)
+        cylinder_map = MapParser.readMRC(ideal_cyl)
+        apix = target_map.apix
+
+    # except Exception as e:
+    #     print e
+    except:
+       print Messages.INPUT_FILES_ERROR
+
+    if start < 1 or not (len(os.listdir(dir_path + "/Templates")) >= 144):
+        # generate templates
         dic_directions = run_templates(target_map, cylinder_map, overwrite=True)
     else:
         try:
-            with open(source_dir + "dir_directions.p") as g:
+            with open(dir_path + "/correlation/dir_directions.p") as g:
                 dic_directions = pickle.load(g)
         except IOError:
             if start > 0:
                 set_status(Messages.BUMPED_BACK)
-                return main(thresh, theta, mid, line, start-1, target_path)
+                return main(thresh, theta, mid, line, start-1, path)
 
 
 
 
 
-    if start < 2 or (not (os.path.isfile(source_dir + "max_score"))):
+    if start < 2 or (not (os.path.isfile(dir_path + "/correlation" + "/max_score"))):
         try:
             # compute correlation
             set_status(Messages.START_CORRELATION)
@@ -121,33 +115,33 @@ def main(thresh, theta, mid, line, start, target_path):
         except IOError:
             if start > 0:
                 set_status(Messages.BUMPED_BACK)
-                return main(thresh, theta, mid, line, start-1, target_path)
+                return main(thresh, theta, mid, line, start-1, path)
     if start < 3:
         graph = run_graph(theta, apix, THRESHOLD=thresh)
     else:
         try:
-            with open(source_dir + "graph.p", 'rb') as g:
+            with open(dir_path + "/source/graph.p", 'rb') as g:
                 graph = pickle.load(g)
         except IOError:
             graph = run_graph(theta,apix, THRESHOLD=thresh)
             if graph == None:
                 if start > 0:
                     set_status(Messages.BUMPED_BACK)
-                    return main(thresh, theta, mid, line, start - 1, target_path)
+                    return main(thresh, theta, mid, line, start - 1, path)
                 else:
                     return
     if start < 4:
         graph2 = run_linkage(theta, mid, line, apix)
     else:
         try:
-            with open(source_dir + "graph2.p", 'rb') as g:
+            with open(dir_path + "/source/graph2.p", 'rb') as g:
                 graph2 = pickle.load(g)
         except IOError:
             graph2 = run_linkage(theta, mid, line, apix)
             if graph2 == None:
                 if start > 0:
                     set_status(Messages.BUMPED_BACK)
-                    return main(thresh, theta, mid, line, start - 1, target_path)
+                    return main(thresh, theta, mid, line, start - 1, path)
                 else:
                     return
 
