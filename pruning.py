@@ -1,3 +1,8 @@
+"""
+Prune the resulted regions, removing non-alpha-helical resembling regions.
+Returns the final matrix.
+A cell with value 0 was found to be non-helix, otherwise, we assign 1-N id for each region and a cell assigned to it.
+"""
 import numpy as np
 
 

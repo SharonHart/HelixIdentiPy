@@ -1,24 +1,13 @@
 # ===========================================================================================
 # This example read a density map and performs operations such as translation, rotation, etc.
 # ===========================================================================================
-import numpy as np
+
 from TEMPy.MapParser import MapParser
-from TEMPy.StructureParser import PDBParser
-import os
 
-from matplotlib.mlab import PCA
+def main(target_path, output_path):
 
 
-def cylinder_creation(path):
-
-    path_out = './source/'
-    if os.path.exists(path_out) == True:
-        print "%s exists" % path_out
-    else:
-        os.mkdir(path_out)
-
-    map_target = MapParser.readMRC(path)  # read target map
-
+    map_target = MapParser.readMRC(target_path)
 
     # 2 Very very simple example of the cylinder
     dr = 2.3  # radius of the cylinder
@@ -43,4 +32,4 @@ def cylinder_creation(path):
                 else:
                     map_target.fullMap[z][y][x] = 0
 
-    map_target.write_to_MRC_file(path_out + 'Cylinder.mrc')
+    map_target.write_to_MRC_file(output_path)
