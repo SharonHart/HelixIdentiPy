@@ -8,10 +8,10 @@ def main(target_path, output_path):
 
 
     map_target = MapParser.readMRC(target_path)
-
+    apix = map_target.apix
     # 2 Very very simple example of the cylinder
-    dr = 2.3  # radius of the cylinder
-    h = 10.8  # height of the cylinder
+    dr = 2.3/apix  # radius of the cylinder
+    h = 10.8/apix  # height of the cylinder
     rho = 1  # density of the cylinder
 
     map_target.shift_origin(0, 0, 0)

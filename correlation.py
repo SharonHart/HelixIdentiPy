@@ -60,6 +60,7 @@ def main(target_map):
             # template.fullMap = shift(template_cylinder.fullMap, [cZ,cY,cX])
             try:
                 correlation_matrix = np.fft.ifftn(np.multiply(np.fft.fftn(target_map.fullMap), np.conj(np.fft.fftn(template_cylinder.fullMap))))
+                correlation_matrix = (np.fft.fftshift(correlation_matrix))
             # correlation_matrix = template_matching(template_cylinder.fullMap, target_map.fullMap)
             # correlation_matrix = np.fft.ifft(np.multiply(np.fft.fft(target_map.fullMap, norm="ortho"), np.conj(np.fft.fft(template_cylinder.fullMap, norm="ortho"))), norm="ortho")
 
