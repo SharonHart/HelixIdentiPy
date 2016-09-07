@@ -53,6 +53,7 @@ def main(graph, target_size):
     ax.set_ylabel('Y Label')
     ax.set_zlabel('Z Label')
     # plt.savefig("3d_plot.png")
+    # plt.figure(figsize=(30, 30))
     plt.show()
     # plt.savefig(out_file_name)
     #
@@ -60,5 +61,4 @@ def main(graph, target_size):
     # plt.close()
 
 
-    # plt.figure(figsize=(30, 30))
     # plt.show()

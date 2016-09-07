@@ -9,7 +9,7 @@ theta = math.pi / 9
 
 APIX = None
 
-def main(score_matrix, max_dir, dic_directions,theta_arg, apix, THRESHOLD=None):
+def main(target_map, score_matrix, max_dir, dic_directions,theta_arg, apix, THRESHOLD=None):
     global APIX
     APIX = apix
     global theta
@@ -24,11 +24,9 @@ def main(score_matrix, max_dir, dic_directions,theta_arg, apix, THRESHOLD=None):
     # create region foreach new node
     # append to graph
     for (x,y,z), value in np.ndenumerate(score_matrix):
-        if (y >= 54):
-            print x, y, z
         if value >= THRESHOLD:
             region = Region()
-            node = Node([x,y,z], max_dir[x,y,z], dic_directions[max_dir[x,y,z][0],max_dir[x,y,z][1]], value, region=region)
+            node = Node(target_map[x,y,z], [x,y,z], max_dir[x,y,z], dic_directions[max_dir[x,y,z][0],max_dir[x,y,z][1]], value, region=region)
             region.nodes.append(node)
             graph.nodes.append(node)
             graph.regions.append(region)

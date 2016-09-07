@@ -10,3 +10,5 @@ def main(graph, target_map):
         region.id = i+1
     target_map.fullMap = target_fullmap
     target_map.write_to_MRC_file("out_map.mrc")
+
+    target_map.mean()

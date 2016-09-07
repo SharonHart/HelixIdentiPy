@@ -9,9 +9,6 @@ from TEMPy.MapParser import *
 from TEMPy.ScoringFunctions import *
 from messages import Messages
 
-save_results = True
-correlate_either_way = True
-
 
 def main(target_map):
 
@@ -20,7 +17,7 @@ def main(target_map):
     dir_path = os.path.dirname(os.path.realpath(__file__))
     corr_dir = dir_path + "/source/"
 
-    if not correlate_either_way and os.path.isfile(corr_dir + "max_score"):
+    if not os.path.isfile(corr_dir + "max_score"):
         return np.load(corr_dir + "max_score"), np.load(corr_dir + "max_dirs")
     max_scores = np.zeros(target_map.box_size())
     max_dirs = np.zeros(target_map.box_size(), dtype=(float, 2))
@@ -44,49 +41,30 @@ def main(target_map):
                 print e
                 print Messages.ERROR_READING_TEMPLATE_FILE.format(template_name)
 
-            # size = template_cylinder.box_size()
-            # a = template_cylinder.apix
-            # value = 0
-            # for z in range(size[0]):
-            #     # print value
-            #     for y in range(size[1]):
-            #         for x in range(size[2]):
-            #             cX = (x - (size[2] // 2)) #* a
-            #             cY = (y - (size[1] // 2)) #* a
-            #             cZ = (z - (size[0] // 2)) #* a
-            #
             template = template_cylinder
-            # template = template_cylinder.translate(cZ,cY,cX)
-            # template.fullMap = shift(template_cylinder.fullMap, [cZ,cY,cX])
             try:
                 correlation_matrix = np.fft.ifftn(np.multiply(np.fft.fftn(target_map.fullMap), np.conj(np.fft.fftn(template_cylinder.fullMap))))
-                correlation_matrix = (np.fft.fftshift(correlation_matrix))
-            # correlation_matrix = template_matching(template_cylinder.fullMap, target_map.fullMap)
-            # correlation_matrix = np.fft.ifft(np.multiply(np.fft.fft(target_map.fullMap, norm="ortho"), np.conj(np.fft.fft(template_cylinder.fullMap, norm="ortho"))), norm="ortho")
+                # python's / MATLAB ifft returns malformed matrix. Issue fixed by running fftshift
+                correlation_matrix = np.fft.fftshift(correlation_matrix)
 
-            # correlation_matrix = norm_xcorr(template_cylinder.fullMap, target_map.fullMap)
-            # val = correlate(target_map.normalise().getMap(), template.normalise().getMap())
-            # sF = ScoringFunctions()
-            # value = sF.CCC(target_map, template)
+                # save the maximal value and direction for each voxel
                 for (x, y, z), value in np.ndenumerate(correlation_matrix):
                     if value > max_scores[x, y, z]:
                         max_scores[x, y, z] = value
                         max_dirs[x, y, z] = (rad_in_x, rad_in_y)
 
             except Exception as e:
-                print e
-                print Messages.CORRELATION_ERROR.format(template_name)
+                print Messages.CORRELATION_ERROR.format(template_name) + e.message
 
     print Messages.DONE_CORRELATION
-    if save_results:
 
-        dir_path = os.path.dirname(os.path.realpath(__file__))
+    dir_path = os.path.dirname(os.path.realpath(__file__))
 
-        score_file = open(dir_path + "/source"+ "/max_score", "w+")
-        dirs_file = open(dir_path + "/source" + "/max_dirs", "w+")
-        np.save(score_file, max_scores)
-        np.save(dirs_file, max_dirs)
-        score_file.close()
-        dirs_file.close()
-        # checkitout()
+    score_file = open(dir_path + "/source"+ "/max_score", "w+")
+    dirs_file = open(dir_path + "/source" + "/max_dirs", "w+")
+    np.save(score_file, max_scores)
+    np.save(dirs_file, max_dirs)
+    score_file.close()
+    dirs_file.close()
+    # checkitout()
     return max_scores, max_dirs

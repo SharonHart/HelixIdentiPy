@@ -10,6 +10,8 @@ from create_cylinder import main as cylinder_creation
 from graph import main as graph_creation
 from linkage import main as link_regions
 from plot_result import main as plot_matrix
+from output_as_map import main as output_as_map
+
 from pruning import main as pruning
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -30,14 +32,14 @@ def run_linkage(theta, mid, line, apix):
         return None
 
 
-def run_graph(theta,apix, THRESHOLD):
+def run_graph(target_map, theta,apix, THRESHOLD):
     try:
         scores = np.load(source_dir + "/max_score")
         directions = np.load(source_dir + "/max_dirs")
         with open(source_dir + "/dir_directions.p", 'rb') as g:
             dic_direct = pickle.load(g)
         set_status(Messages.START_GRAPH)
-        graph = graph_creation(scores, directions, dic_direct, theta,apix, THRESHOLD=THRESHOLD)
+        graph = graph_creation(target_map, scores, directions, dic_direct, theta,apix, THRESHOLD=THRESHOLD)
         set_status(Messages.END_GRAPH)
         with open(source_dir + "/graph.p", 'wb') as f:
             pickle.dump(graph, f)
@@ -97,7 +99,7 @@ def main(thresh, theta, mid, line, start, target_path):
 
     apix = target_map.apix  # Target map resolution
 
-    if start < 1 or not (len(os.listdir(templates_dir)) >= 144):
+    if start < 1 or len(os.listdir(templates_dir)) < 144:
         # Generate templates
         dic_directions = run_templates(target_map, cylinder_map, overwrite=True)
     else:
@@ -120,13 +122,13 @@ def main(thresh, theta, mid, line, start, target_path):
                 set_status(Messages.BUMPED_BACK)
                 return main(thresh, theta, mid, line, start-1, target_path)
     if start < 3:
-        graph = run_graph(theta, apix, THRESHOLD=thresh)
+        graph = run_graph(target_map, theta, apix, THRESHOLD=thresh)
     else:
         try:
             with open(source_dir + "/graph.p", 'rb') as g:
                 graph = pickle.load(g)
         except IOError:
-            graph = run_graph(theta,apix, THRESHOLD=thresh)
+            graph = run_graph(target_map, theta,apix, THRESHOLD=thresh)
             if graph is None:
                 if start > 0:
                     set_status(Messages.BUMPED_BACK)
@@ -148,10 +150,15 @@ def main(thresh, theta, mid, line, start, target_path):
                 else:
                     return
 
-    #output = pruning(graph2, cylinder_map.box_size())
-    set_status(Messages.END_RUN)
+    output, graph2 = pruning(graph2, target_map)
+    set_status(Messages.END_RUN.format(len(graph2.regions)))
+
+
+    output_as_map(graph2, target_map)
 
     plot_matrix(graph2, target_map.box_size())
+
+
 
 if __name__ == "__main__":
     main()

@@ -29,7 +29,7 @@ def get_start(value):
 
 
 def gogo(entries):
-    thresh = None if entries['Threshold'].get() == "default"  else (int(entries['Threshold'].get()))
+    thresh = None if entries['Threshold'].get() == "default"  else (float(entries['Threshold'].get()))
     theta = (int(entries['Theta (degrees)'].get()))
     mid = (int(entries['Midpoint Distance (angstrom)'].get())) #todo
     line = (int(entries['Line Distance (angstrom)'].get())) #todo
@@ -56,10 +56,10 @@ def makeform(root, fields):
             ent.insert(0, "20")
         elif cntr == 2:
             ent = Entry(row)
-            ent.insert(0, "1300")
+            ent.insert(0, "13")
         elif cntr == 3:
             ent = Entry(row)
-            ent.insert(0, "400")
+            ent.insert(0, "4")
         elif cntr == 4:
             ent = ttk.Combobox(row)
             ent['values'] = ('start', 'after_templates','after_correlation', 'after_graph', 'just_plot')
@@ -111,8 +111,8 @@ def main():
     root.wm_title("HelixIdentiPy (ver 0.1) - Find helices!")
 
     # Set window icon
-    #icon = PhotoImage(file=icon_path)
-    #root.tk.call('wm', 'iconphoto', root._w, icon)
+    icon = PhotoImage(file=icon_path)
+    root.tk.call('wm', 'iconphoto', root._w, icon)
 
     # Instantiate top panel with logo
     img = Image.open(logo_path)

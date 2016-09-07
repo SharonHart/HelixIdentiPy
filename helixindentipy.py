@@ -13,8 +13,8 @@ def main():
 
     threshold = None
     theta = 20
-    mid = 1300
-    line = 400
+    mid = 13
+    line = 4
     phase = 0
 
     if len(sys.argv) < 2:

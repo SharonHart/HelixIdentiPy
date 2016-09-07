@@ -20,7 +20,8 @@ class Node:
     score: float. The direction correlation score.
     pca_dir: float. pc1 direction of the Node.
     """
-    def __init__(self, voxel, direction, pca_dir, score, region=None):
+    def __init__(self, value, voxel, direction, pca_dir, score, region=None):
+        self.value = value
         self.region = region
         self.voxel = voxel
         self.direction = direction
