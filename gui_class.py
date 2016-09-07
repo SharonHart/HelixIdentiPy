@@ -12,6 +12,7 @@ fields = ('Threshold', 'Theta (degrees)', 'Midpoint Distance (angstrom)', 'Line 
 input_path = None
 status = None
 
+
 def get_start(value):
     if value == "start":
         return 0
@@ -78,6 +79,8 @@ def makeform(root, fields):
 def choose_file(e):
     global input_path
     input_path = tkFileDialog.askopenfilename()
+    if not (input_path is None  or len(input_path)==0):
+        e['MAP file'].delete(0, END)
     print "Reading File: " + input_path
     e['MAP file'].insert(0, input_path.split('/')[len(input_path.split('/'))-1])
 

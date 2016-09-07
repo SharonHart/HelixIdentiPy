@@ -109,10 +109,6 @@ def main(thresh, theta, mid, line, start, target_path):
                 set_status(Messages.BUMPED_BACK)
                 return main(thresh, theta, mid, line, start-1, target_path)
 
-
-
-
-
     if start < 2 or (not (os.path.isfile(source_dir + "/max_score"))):
         try:
             # compute correlation
@@ -131,7 +127,7 @@ def main(thresh, theta, mid, line, start, target_path):
                 graph = pickle.load(g)
         except IOError:
             graph = run_graph(theta,apix, THRESHOLD=thresh)
-            if graph == None:
+            if graph is None:
                 if start > 0:
                     set_status(Messages.BUMPED_BACK)
                     return main(thresh, theta, mid, line, start - 1, target_path)
@@ -145,14 +141,14 @@ def main(thresh, theta, mid, line, start, target_path):
                 graph2 = pickle.load(g)
         except IOError:
             graph2 = run_linkage(theta, mid, line, apix)
-            if graph2 == None:
+            if graph2 is None:
                 if start > 0:
                     set_status(Messages.BUMPED_BACK)
                     return main(thresh, theta, mid, line, start - 1, target_path)
                 else:
                     return
 
-    output = pruning(graph2, cylinder_map.box_size())
+    #output = pruning(graph2, cylinder_map.box_size())
     set_status(Messages.END_RUN)
 
     plot_matrix(graph2, target_map.box_size())

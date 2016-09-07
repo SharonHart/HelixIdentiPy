@@ -21,9 +21,9 @@ def main(target_map, cylinder_map, overwrite=False):
 #
  #   # smooth cylinder by gaussian mask TODO: figure out how to get sigma and what function to use
     sigma = target_map.apix
-    # cylinder_array = gaussian_filter(cylinder_array, sigma)
+   # cylinder_array = gaussian_filter(cylinder_array, sigma)
 
-    # cylinder_map.fullMap = cylinder_array
+    #cylinder_map.fullMap = cylinder_array
     dir_path = os.path.dirname(os.path.realpath(__file__))
     directory = dir_path + "/Templates"
     if not os.path.exists(directory):
