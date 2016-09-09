@@ -6,7 +6,7 @@ A cell with value 0 was found to be non-helix, otherwise, we assign 1-N id for e
 import numpy as np
 import math
 
-STD_THRESHOLD = 0.2
+STD_THRESHOLD = 0.1
 HELIX_LENGTH_THRESHOLD = 10000
 
 def main(graph, target_map):

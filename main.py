@@ -52,13 +52,13 @@ def run_templates(target_map_path, run):
     """
     try:
         if run:
-            target_map, apix = read_map(target_path)
+            target_map, apix = read_map(target_map_path)
             utils.set_status(Messages.START_CYL)
-            cylinder_map = cylinder_creation(target_map)
+            cylinder_map, shape, limits = cylinder_creation(target_map)
             cylinder_map.write_to_MRC_file(source_dir + "Cylinder.mrc")
             utils.set_status(Messages.END_CYL)
             utils.set_status(Messages.START_TEMPLATES)
-            dic_directions = create_templates(target_map.apix, cylinder_map, templates_dir, template_format)
+            dic_directions = create_templates(target_map.apix, cylinder_map, templates_dir, template_format, shape, limits)
             utils.set_status(Messages.END_TEMPLATES)
             utils.dump(path=source_dir + "dir_directions.p", object=dic_directions)
         else:
@@ -205,7 +205,7 @@ def main(thresh, theta, mid, line, start, input_path):
     # Run pruning. Get regional graph after bad regions prune
     output, graph3 = run_pruning(target_map=target_map, run=True if start<5 else False, graph2=graph2)
 
-    utils.set_status(Messages.END_RUN.format(len(graph2.regions)))
+    utils.set_status(Messages.END_RUN.format(len(graph3.regions)))
 
     # Output resulted mrc file
     output_as_map(graph3, target_map)
@@ -213,5 +213,6 @@ def main(thresh, theta, mid, line, start, input_path):
     # Plot the result in 3D
     plot_matrix(graph3, target_map.box_size())
 
+    return output
 if __name__ == "__main__":
     main()
