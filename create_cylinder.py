@@ -43,8 +43,6 @@ def calc(template_cylinder):
     B = np.argwhere(np.array(template_cylinder.fullMap))
     (zstart, ystart, xstart), (zstop, ystop, xstop) = B.min(0), B.max(0)
     limits = [(zstart, ystart, xstart), (zstop, ystop, xstop)]
-    print (ystart, xstart)
-    print  (ystop, xstop)
     Atrim = template_cylinder.fullMap[zstart:zstop + 1, ystart:ystop + 1, xstart:xstop + 1]
     Atrim = np.lib.pad(Atrim, ((PAD, PAD), (PAD, PAD), (PAD, PAD)), 'constant', constant_values=(0, 0))
 

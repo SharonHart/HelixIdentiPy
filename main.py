@@ -16,6 +16,7 @@ from pruning import main as pruning
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 source_dir = dir_path + "/source/"
+output_dir = dir_path + "/output/"
 templates_dir = dir_path + "/Templates/"
 template_format = "template{0}_{1}.mrc"
 target_path = ""
@@ -29,7 +30,8 @@ def create_project_dirs():
         os.makedirs(source_dir)
     if not os.path.exists(templates_dir):
         os.makedirs(templates_dir)
-
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 def read_map(input_path):
     """
     Read map file from path, Using TemPy
@@ -136,28 +138,27 @@ def run_linkage(run, graph, mid, line, apix):
         return None
 
 
-def run_pruning(target_map, run, graph2):
+def run_pruning(target_map, run, linked_graph):
     """
     Runs pruning
     :param run: boolean. Whether to run again or load rel. files
     :return: Regional graph after pruning
     """
-    # try:
-    if run:
-        utils.set_status(Messages.START_PRUN)
-        output, graph3 = pruning(graph2, target_map)
-        utils.set_status(Messages.END_PRUN)
-        utils.dump(path=dir_path + "output", object=output, is_np=True)
-        utils.dump(path=source_dir + "graph3.p", object=graph3, is_np=False)
+    try:
+        if run:
+            utils.set_status(Messages.START_PRUN)
+            output, pruned_graph = pruning(linked_graph, target_map)
+            utils.set_status(Messages.END_PRUN)
+            utils.dump(path=output_dir + "output", object=output, is_np=True)
+            utils.dump(path=source_dir + "pruned_graph.p", object=pruned_graph, is_np=False)
 
-    else:
-        output = utils.load(path=source_dir + "output", is_np=True)
-        graph3 = utils.load(path=source_dir + "graph3.p", is_np=False)
-    return output, graph3
-# except Exception as e:
-    #     utils.set_status(Messages.FAIL_PRUN)
-    #     print e.message
-    #     return None
+        else:
+            output = utils.load(path=output_dir + "output", is_np=True)
+            pruned_graph = utils.load(path=output_dir + "pruned_graph.p", is_np=False)
+        return output, pruned_graph
+    except Exception as e:
+        utils.set_status(Messages.FAIL_PRUN)
+        return None
 
 
 def back_main(thresh, theta, mid, line, start, target_path):
@@ -197,21 +198,21 @@ def main(thresh, theta, mid, line, start, input_path):
     max_scores, max_dirs = run_correlation(target_map, run=True if start<2 else False)
 
     # Run graph creation. Get regional graph with high scored voxels as Nodes
-    graph = run_graph(target_map, run=True if start<3 else False, scores=max_scores,directions= max_dirs,dic_direct=dic_directions,
+    graph = run_graph(target_map, run=True if start<3 else False, scores=max_scores, directions= max_dirs, dic_direct=dic_directions,
                       theta=theta, THRESHOLD=thresh)
     # Run linkage. Get regional graph after region linking
-    graph2 = run_linkage(run=True if start<4 else False, graph=graph, mid=mid, line=line, apix=apix)
+    linked_graph = run_linkage(run=True if start<4 else False, graph=graph, mid=mid, line=line, apix=apix)
 
     # Run pruning. Get regional graph after bad regions prune
-    output, graph3 = run_pruning(target_map=target_map, run=True if start<5 else False, graph2=graph2)
+    output, pruned_graph = run_pruning(target_map=target_map, run=True if start<5 else False, linked_graph=linked_graph)
 
-    utils.set_status(Messages.END_RUN.format(len(graph3.regions)))
+    utils.set_status(Messages.END_RUN.format(len(pruned_graph.regions)))
 
     # Output resulted mrc file
-    output_as_map(graph3, target_map)
+    output_as_map(pruned_graph, target_map, output_dir)
 
     # Plot the result in 3D
-    plot_matrix(graph3, target_map.box_size())
+    plot_matrix(pruned_graph, target_map.box_size())
 
     return output
 if __name__ == "__main__":

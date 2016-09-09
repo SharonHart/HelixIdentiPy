@@ -33,7 +33,6 @@ def angle_satisfiable(region_1, region_2):
         region_2.calc_pca()
     except Exception as e:
         print len(region_1.nodes), len(region_2.nodes)
-        print "FUCK"
         return False
     angle_1, angle_2 = region_1.pca.components_[0], region_2.pca.components_[0]
     return angle(angle_1, angle_2)*57.2958 < ANGLE_BETWEEN_REGIONS

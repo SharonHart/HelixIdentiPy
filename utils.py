@@ -3,7 +3,7 @@ Project's Utilities.
 """
 
 from __future__ import print_function
-
+import sys
 import pickle
 import numpy as np
 
@@ -49,5 +49,6 @@ def set_status(stat, same_line=False):
     else:
         if same_line:
             print("\r"+stat, end=" ")
+            sys.stdout.flush()
         else:
             print(stat)

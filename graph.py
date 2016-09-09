@@ -25,8 +25,8 @@ def main(target_map, score_matrix, max_dir, dic_directions,theta_arg, thresh=Non
 
     # Default threshold
     if not thresh:
-        N = 1000
-        THRESHOLD = np.percentile(score_matrix, 100 - ((float(N) / score_matrix.size) * 100))
+        THRESHOLD = 0.83
+        score_matrix /= score_matrix.max()
 
     # Percentile option
     elif 0 <= thresh <= 1:
