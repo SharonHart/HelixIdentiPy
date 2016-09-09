@@ -5,6 +5,7 @@ Returns a score matrix and a direction matrix holding the best directions f.e. v
 
 import os
 
+import utils
 import numpy as np
 from TEMPy.MapParser import *
 from TEMPy.ScoringFunctions import *
@@ -19,18 +20,16 @@ def main(target_map):
 
     templates_dir = dir_path + "/Templates"
     target_map.fullMap = target_map.fullMap / target_map.fullMap.max()
-
+    sanity = 0
     for i in range(12):  # for every x rotation
         rad_in_x = (math.pi / 12) * i  # y axis rotation (in rads)
         for j in range(12):  # for every y rotation
             rad_in_y = (math.pi / 12) * j  # y axis rotation (in rads)
             template_name = "/template{0}_{1}.mrc".format(i, j)
-            print template_name
             try:
                 template_cylinder = MapParser.readMRC(templates_dir + template_name)
             except Exception as e:
-                print e
-                print Messages.ERROR_READING_TEMPLATE_FILE.format(template_name)
+                utils.set_status( Messages.ERROR_READING_TEMPLATE_FILE.format(template_name))
 
             template = template_cylinder
             try:
@@ -43,8 +42,9 @@ def main(target_map):
                     if value > max_scores[x, y, z]:
                         max_scores[x, y, z] = value
                         max_dirs[x, y, z] = (rad_in_x, rad_in_y)
-
+                sanity += 1
+                utils.set_status(Messages.CORRELATION_PROGRESS.format(str(sanity*100/144)),same_line=True)
             except Exception as e:
-                Messages.CORRELATION_ERROR.format(template_name) + e.message
+                utils.set_status(Messages.CORRELATION_ERROR.format(template_name) + e.message)
 
     return max_scores, max_dirs

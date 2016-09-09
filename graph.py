@@ -2,23 +2,24 @@ import math
 from classes import *
 
 # create graph instance
-graph = Graph()
 theta = math.pi / 9
 
 APIX = None
 
-def main(target_map, score_matrix, max_dir, dic_directions,theta_arg, apix, THRESHOLD=None):
+def main(target_map, score_matrix, max_dir, dic_directions,theta_arg, apix, thresh=None):
     global APIX
     APIX = apix
     global theta
     theta = theta_arg
-    global graph
-    if not THRESHOLD:
-        N = 8000
+    graph = Graph()
+    if not thresh:
+        N = 1000
         THRESHOLD = np.percentile(score_matrix, 100 - ((float(N) / score_matrix.size) * 100))
-    if 0 < THRESHOLD <= 1:
+    elif 0 <= thresh <= 1:
+        THRESHOLD = thresh
         score_matrix /= score_matrix.max()
-
+    else:
+        THRESHOLD = np.percentile(score_matrix, 100 - ((float(thresh) / score_matrix.size) * 100))
     # create nodes that are above threshold
     # create region foreach new node
     # append to graph
@@ -37,7 +38,7 @@ def main(target_map, score_matrix, max_dir, dic_directions,theta_arg, apix, THRE
             node2 = graph.nodes[j]
             if should_connect(node1, node2):
                 print i,j
-                connect(node1, node2)
+                connect(graph, node1, node2)
     return graph
 
 
@@ -122,7 +123,7 @@ def should_connect(node1, node2):
     return is_neighbours(node1, node2) and is_theta_parallel(node1, node2) and is_predicate_verified(node1, node2)
 
 
-def connect(node1, node2):
+def connect(graph, node1, node2):
     edge = (node1, node2)
     graph.edges.append(edge)
     graph.remove_region(node1.region)

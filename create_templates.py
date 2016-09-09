@@ -44,5 +44,5 @@ def main(target_map, cylinder_map):
             template_cylinder.fullMap = cylinder_array
             template_cylinder.write_to_MRC_file(directory + "/template{0}_{1}.mrc".format(i, j))
             sanity += 1
-            utils.set_status(Messages.PROGRESS_TEMPLATES.format(str(sanity*100/144)))
+            utils.set_status(Messages.PROGRESS_TEMPLATES.format(str(sanity*100/144)), same_line=True)
     return dic

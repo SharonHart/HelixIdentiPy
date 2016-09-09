@@ -1,3 +1,6 @@
+"""
+Project's Messages
+"""
 
 class Messages:
 
@@ -19,11 +22,12 @@ class Messages:
 
 
     START_TEMPLATES = "Generating templates......"
-    PROGRESS_TEMPLATES = "Generating templates...... {}%"
+    PROGRESS_TEMPLATES = "Generating templates......\t{}%"
     END_TEMPLATES = "Templates ready!"
     FAIL_TEMPLATES = "Generating templates failed :("
 
     START_CORRELATION = "Correlating......"
+    CORRELATION_PROGRESS = "Correlating......\t{}%"
     DONE_CORRELATION = "Correlated target with templates!"
     FAIL_CORRELATION = "Correlation failed :("
 
