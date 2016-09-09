@@ -33,7 +33,7 @@ def main(graph, target_map):
 
         # If all of the above are valid, add the region to the final region list
         valid_regions.append(region)
-    print "pruned {}".format(len(graph.regions) - len(valid_regions))
+    print "Found {} and pruned {}".format(len(graph.regions), len(graph.regions) - len(valid_regions))
     graph.regions = valid_regions
 
 

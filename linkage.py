@@ -104,8 +104,6 @@ def main(graph, mid, line, apix):
             if (i, j, len(graph.regions)) == (2, 3, 96):
                 pass
 
-            print i, len(graph.regions)-1, len(graph.regions)
-
             region_1 = graph.regions[i]
             last_region = graph.regions[len(graph.regions)-1]
 
@@ -127,7 +125,6 @@ def main(graph, mid, line, apix):
             for j in range(i + 1, len(graph.regions)):
                 if (i,j, len(graph.regions)) == (2, 3, 96):
                     pass
-                print i,j, len(graph.regions)
 
                 region_1 = graph.regions[i]
                 region_2 = graph.regions[j]
