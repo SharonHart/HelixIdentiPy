@@ -4,10 +4,10 @@
 
 from TEMPy.MapParser import MapParser
 
-def main(target_path, output_path):
+def main(map_target, output_path):
 
 
-    map_target = MapParser.readMRC(target_path)
+    # map_target = MapParser.readMRC(target_path)
     apix = map_target.apix
     # 2 Very very simple example of the cylinder
     dr = 2.3/apix  # radius of the cylinder
@@ -33,3 +33,4 @@ def main(target_path, output_path):
                     map_target.fullMap[z][y][x] = 0
 
     map_target.write_to_MRC_file(output_path)
+    return map_target

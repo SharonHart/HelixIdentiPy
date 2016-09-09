@@ -3,8 +3,6 @@ from classes import *
 
 # create graph instance
 graph = Graph()
-directions = None
-scores = None
 theta = math.pi / 9
 
 APIX = None
@@ -14,6 +12,7 @@ def main(target_map, score_matrix, max_dir, dic_directions,theta_arg, apix, THRE
     APIX = apix
     global theta
     theta = theta_arg
+    global graph
     if not THRESHOLD:
         N = 8000
         THRESHOLD = np.percentile(score_matrix, 100 - ((float(N) / score_matrix.size) * 100))
@@ -31,7 +30,7 @@ def main(target_map, score_matrix, max_dir, dic_directions,theta_arg, apix, THRE
             graph.nodes.append(node)
             graph.regions.append(region)
 
-    # foreach pair of nodes check if they should be connected and appended to region todo:  this is a naive impl change for a better one
+    # foreach pair of nodes check if they should be connected and appended to region
     for i in range(len(graph.nodes)):
         node1 = graph.nodes[i]
         for j in range(i+1, len(graph.nodes)):
@@ -63,7 +62,7 @@ def theta_parallel(node1, node2, theta):
 
 
 def pairwise_region_parallelism(region1, region2, theta):
-    for node1 in region1.nodes: # todo  this is naive
+    for node1 in region1.nodes:
         for node2 in region2.nodes:
             if not theta_parallel(node1, node2, theta): return False
     return True
@@ -98,10 +97,10 @@ def is_theta_parallel(node1, node2, theta=20):
         r_new.nodes = r1.nodes + r2.nodes
         return region_pca_parallelism(r_new)
 
-def is_predicate_verified(node1, node2): #todo
+def is_predicate_verified(node1, node2):
     r1 = node1.region
     r2 = node2.region
-
+    global APIX
     # same region
     if r1 == r2: return False
 

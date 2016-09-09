@@ -1,71 +1,115 @@
 import os
-import global_vars
-import pickle
-import numpy as np
+
 from TEMPy.MapParser import *
-from messages import Messages
-from create_templates import main as create_templates
+
+import utils
 from correlation import main as correlate
 from create_cylinder import main as cylinder_creation
+from create_templates import main as create_templates
 from graph import main as graph_creation
 from linkage import main as link_regions
-from plot_result import main as plot_matrix
+from messages import Messages
 from output_as_map import main as output_as_map
-
+from plot_result import main as plot_matrix
 from pruning import main as pruning
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 source_dir = dir_path + "/source/"
 templates_dir = dir_path + "/Templates/"
+target_path = ""
+target_map = None
+cylinder_map = None
+apix = None
 
-def run_linkage(theta, mid, line, apix):
+def run_templates(run):
     try:
-        with open(source_dir + "/graph.p", 'rb') as g:
-            graph_prev = pickle.load(g)
-        set_status(Messages.START_LINK)
-        graph=link_regions(graph_prev, theta, mid, line, apix)
-        set_status(Messages.END_LINK)
-        with open(dir_path + "/source/graph2.p", 'wb') as f:
-            pickle.dump(graph, f)
-        return graph
-    except IOError:
-        return None
-
-
-def run_graph(target_map, theta,apix, THRESHOLD):
-    try:
-        scores = np.load(source_dir + "/max_score")
-        directions = np.load(source_dir + "/max_dirs")
-        with open(source_dir + "/dir_directions.p", 'rb') as g:
-            dic_direct = pickle.load(g)
-        set_status(Messages.START_GRAPH)
-        graph = graph_creation(target_map, scores, directions, dic_direct, theta,apix, THRESHOLD=THRESHOLD)
-        set_status(Messages.END_GRAPH)
-        with open(source_dir + "/graph.p", 'wb') as f:
-            pickle.dump(graph, f)
-        return graph
-    except IOError:
-        return None
-
-
-def run_templates(target_map, cylinder_map, overwrite):
-    # try:
-        set_status(Messages.START_TEMPLATES)
-        dic_directions = create_templates(target_map, cylinder_map, overwrite=True)
-        set_status(Messages.END_TEMPLATES)
+        if run:
+            utils.set_status(Messages.START_CYL)
+            cylinder_map = cylinder_creation(target_map, output_path=source_dir + "Cylinder.mrc")
+            utils.set_status(Messages.END_CYL)
+            utils.set_status(Messages.START_TEMPLATES)
+            dic_directions = create_templates(target_map, cylinder_map)
+            utils.set_status(Messages.END_TEMPLATES)
+            utils.dump(path=source_dir + "dir_directions.p", object=dic_directions)
+        else:
+            dic_directions = utils.load(path=source_dir + "dir_directions.p")
         return dic_directions
-    # except IOError:
-    #     return None
+    except Exception as e:
+        utils.set_status(Messages.FAIL_TEMPLATES)
+        return None
+
+def run_correlation(run):
+    try:
+        if run:
+            # compute correlation
+            utils.set_status(Messages.START_CORRELATION)
+            max_scores, max_dirs = correlate(target_map)
+            utils.dump(path=source_dir + "max_score",object=max_scores ,is_np=True)
+            utils.dump(path=source_dir + "max_dirs",object=max_dirs ,is_np=True)
+            utils.set_status(Messages.DONE_CORRELATION)
+        else:
+            max_scores = utils.load(path=source_dir + "max_score", is_np=True)
+            max_dirs = utils.load(path=source_dir + "max_dirs", is_np=True)
+        return max_scores, max_dirs
+    except Exception as e:
+        utils.set_status(Messages.FAIL_CORRELATION)
+        return None
 
 
-def set_status(stat):
-    if global_vars.isGui:
-        global_vars.status_bar.set(stat)
-    else:
-        print stat
+def run_graph(theta,apix, THRESHOLD, scores, directions, dic_direct, run):
+    try:
+        if run:
+            utils.set_status(Messages.START_GRAPH)
+            graph = graph_creation(target_map, scores, directions, dic_direct, theta,apix, THRESHOLD=THRESHOLD)
+            utils.set_status(Messages.END_GRAPH)
+            utils.dump(path=source_dir + "graph.p", object=graph)
+        else:
+            graph = utils.load(source_dir + "graph.p")
+        return graph
+    except Exception as e:
+        utils.set_status(Messages.FAIL_GRAPH)
+        return None
 
 
-def main(thresh, theta, mid, line, start, target_path):
+def run_linkage(run, graph, theta, mid, line, apix):
+    try:
+        if run:
+            utils.set_status(Messages.START_LINK)
+            graph2=link_regions(graph, theta, mid, line, apix)
+            utils.set_status(Messages.END_LINK)
+            utils.dump(path=source_dir + "graph2.p", object=graph2)
+        else:
+            graph2 = utils.load(source_dir + "graph2.p")
+        return graph2
+    except Exception as e:
+        utils.set_status(Messages.FAIL_LINK)
+        return None
+
+
+def run_pruning(run, graph2, target_map):
+    try:
+        if run:
+            utils.set_status(Messages.START_PRUN)
+            output, graph3 = pruning(graph2, target_map)
+            utils.set_status(Messages.END_PRUN)
+            utils.dump(path=source_dir + "output", object=output, is_np=True)
+            utils.dump(path=source_dir + "graph3.p", object=graph3, is_np=False)
+
+        else:
+            output = utils.load(path=source_dir + "output", is_np=True)
+            graph3 = utils.load(path=source_dir + "graph3.p", is_np=False)
+        return output, graph3
+    except Exception as e:
+        utils.set_status(Messages.FAIL_PRUN)
+        return None
+
+
+def back_main(thresh, theta, mid, line, start, target_path):
+    utils.set_status(Messages.BUMPED_BACK)
+    main(thresh, theta, mid, line, start, target_path)
+
+
+def main(thresh, theta, mid, line, start, input_path):
     """ Calls the main algorithm stages
     :param thresh: Threshold for adding voxels as nodes in the regional graph
     :param theta: The allowed angle between two graph nodes
@@ -73,11 +117,12 @@ def main(thresh, theta, mid, line, start, target_path):
     :param line: Line distance for the linkage stage
     :param start: Algorithm start point for parameters changing during run
            0: all, 1:after create template, 2:after correlation, 3: after graph, 4: just plot
-    :param target_path: Path for the target map file
+    :param input_path: Path for the target map file
     :return: Method. Plots the resulted graph and matrix
     """
-
-    set_status(Messages.START_RUN)
+    utils.set_status(Messages.START_RUN)
+    global target_path
+    target_path = input_path
 
     # Create projects directories for intermidiate file savings
     if not os.path.exists(source_dir):
@@ -85,79 +130,38 @@ def main(thresh, theta, mid, line, start, target_path):
     if not os.path.exists(templates_dir):
         os.makedirs(templates_dir)
 
-    # Create the ideal cylinder.
-    set_status(Messages.START_CYL)
-    cylinder_creation(target_path, output_path=source_dir + "Cylinder.mrc")
-    set_status(Messages.END_CYL)
 
     # Read map files
     try:
-        target_map = MapParser.readMRC(target_path)
-        cylinder_map = MapParser.readMRC(source_dir + "Cylinder.mrc")
+        global target_map
+        target_map = MapParser.readMRC(input_path)
+        apix = target_map.apix  # Target map resolution
+
+        # cylinder_map = MapParser.readMRC(source_dir + "Cylinder.mrc")
     except:
-       print Messages.INPUT_FILES_ERROR
-
-    apix = target_map.apix  # Target map resolution
-
-    if start < 1 or len(os.listdir(templates_dir)) < 144:
-        # Generate templates
-        dic_directions = run_templates(target_map, cylinder_map, overwrite=True)
-    else:
-        try:
-            with open(source_dir + "dir_directions.p") as g:
-                dic_directions = pickle.load(g)
-        except IOError:
-            if start > 0:
-                set_status(Messages.BUMPED_BACK)
-                return main(thresh, theta, mid, line, start-1, target_path)
-
-    if start < 2 or (not (os.path.isfile(source_dir + "/max_score"))):
-        try:
-            # compute correlation
-            set_status(Messages.START_CORRELATION)
-            max_score, max_dirs = correlate(target_map)
-            set_status(Messages.DONE_CORRELATION)
-        except IOError:
-            if start > 0:
-                set_status(Messages.BUMPED_BACK)
-                return main(thresh, theta, mid, line, start-1, target_path)
-    if start < 3:
-        graph = run_graph(target_map, theta, apix, THRESHOLD=thresh)
-    else:
-        try:
-            with open(source_dir + "/graph.p", 'rb') as g:
-                graph = pickle.load(g)
-        except IOError:
-            graph = run_graph(target_map, theta,apix, THRESHOLD=thresh)
-            if graph is None:
-                if start > 0:
-                    set_status(Messages.BUMPED_BACK)
-                    return main(thresh, theta, mid, line, start - 1, target_path)
-                else:
-                    return
-    if start < 4:
-        graph2 = run_linkage(theta, mid, line, apix)
-    else:
-        try:
-            with open(source_dir + "/graph2.p", 'rb') as g:
-                graph2 = pickle.load(g)
-        except IOError:
-            graph2 = run_linkage(theta, mid, line, apix)
-            if graph2 is None:
-                if start > 0:
-                    set_status(Messages.BUMPED_BACK)
-                    return main(thresh, theta, mid, line, start - 1, target_path)
-                else:
-                    return
-
-    output, graph2 = pruning(graph2, target_map)
-    set_status(Messages.END_RUN.format(len(graph2.regions)))
+        print Messages.INPUT_FILES_ERROR
 
 
-    output_as_map(graph2, target_map)
+    # Generate templates
+    dic_directions = run_templates(run=True if start<1 else False)
+    # if dic_directions is None and start > 0: back_main(thresh, theta, mid, line, start-1, target_path)
 
-    plot_matrix(graph2, target_map.box_size())
+    max_scores, max_dirs = run_correlation(run=True if start<2 else False)
 
+    graph = run_graph(run=True if start<3 else False, scores=max_scores,directions= max_dirs,dic_direct=dic_directions,
+                      theta=theta, apix=apix, THRESHOLD=thresh)
+    graph2 = run_linkage(run=True if start<4 else False, graph=graph, theta=theta, mid=mid, line=line, apix=apix)
+
+    output, graph3 = run_pruning(run=True if start<5 else False, graph2=graph2, target_map=target_map)
+
+    utils.set_status(Messages.END_RUN.format(len(graph2.regions)))
+
+
+    output_as_map(graph3, target_map)
+
+    plot_matrix(graph3, target_map.box_size())
+
+    return output
 
 
 if __name__ == "__main__":

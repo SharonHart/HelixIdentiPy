@@ -31,8 +31,8 @@ def get_start(value):
 def gogo(entries):
     thresh = None if entries['Threshold'].get() == "default"  else (float(entries['Threshold'].get()))
     theta = (int(entries['Theta (degrees)'].get()))
-    mid = (int(entries['Midpoint Distance (angstrom)'].get())) #todo
-    line = (int(entries['Line Distance (angstrom)'].get())) #todo
+    mid = (int(entries['Midpoint Distance (angstrom)'].get()))
+    line = (int(entries['Line Distance (angstrom)'].get()))
     start = get_start(entries['Start at stage'].get())
 
     # messagebox.showinfo("Work in progress",
@@ -97,8 +97,8 @@ class StatusBar(Frame):
                           font=('arial', 12, 'normal'))
         self.label.pack(fill=X)
 
-    def set(self, format, *args):
-        self.label.config(text=format % args)
+    def set(self, format):
+        self.label.config(text=format)
         self.label.update_idletasks()
 
     def clear(self):

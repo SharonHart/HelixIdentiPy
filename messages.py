@@ -1,21 +1,31 @@
 
 class Messages:
 
+    START_PRUN = "Pruning regions..."
+    END_PRUN = "Pruning completed!"
+    FAIL_PRUN = "Pruning failed :("
+
     START_LINK = "Linking regions..."
     END_LINK = "Linkage completed!"
+    FAIL_LINK = "Linking regions failed :("
 
     START_GRAPH = "Creating graph..."
     END_GRAPH = "Graph ready!"
+    FAIL_GRAPH = "Creating graph failed :("
+
 
     START_CYL = "Creating an ideal cylinder for your target map..."
     END_CYL = "Your ideal cylinder is ready!"
 
 
     START_TEMPLATES = "Generating templates......"
+    PROGRESS_TEMPLATES = "Generating templates...... {}%"
     END_TEMPLATES = "Templates ready!"
+    FAIL_TEMPLATES = "Generating templates failed :("
 
     START_CORRELATION = "Correlating......"
     DONE_CORRELATION = "Correlated target with templates!"
+    FAIL_CORRELATION = "Correlation failed :("
 
     START_RUN = "Preparing shotgun to hunt helices..."
     END_RUN = "Done!\tCaught {} helices."
