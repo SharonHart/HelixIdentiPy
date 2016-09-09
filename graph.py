@@ -1,7 +1,11 @@
+"""
+Create graph with nodes as good scores voxels.
+Connect nodes under correct algorithm restrictions.
+"""
+
 import math
 from classes import *
 
-# create graph instance
 theta = math.pi / 9
 
 APIX = None

@@ -1,25 +1,25 @@
-# ===========================================================================================
-# This example read a density map and performs operations such as translation, rotation, etc.
-# ===========================================================================================
+"""
+Creates Ideal Cylinder based on the input map.
+"""
 
-from TEMPy.MapParser import MapParser
-
-def main(map_target, output_path):
-
-
-    # map_target = MapParser.readMRC(target_path)
+def main(map_target):
+    """
+    :param map_target: Target map instance
+    :return: Map instance representing an ideal cylinder
+    """
+    # Get the apix from the target map for cylinder parameters calculations
     apix = map_target.apix
-    # 2 Very very simple example of the cylinder
-    dr = 2.3/apix  # radius of the cylinder
-    h = 10.8/apix  # height of the cylinder
-    rho = 1  # density of the cylinder
+
+    dr = 2.3/apix  # Ideal cylinder radius
+    h = 10.8/apix  # Ideal cylinder height. Two turned Helix
+    rho = 1  # Ideal cylinder density.
 
     map_target.shift_origin(0, 0, 0)
 
     dz = len(map_target.fullMap) * map_target.apix / 2
     dy = len(map_target.fullMap[0]) * map_target.apix / 2
     dx = len(map_target.fullMap[0][0]) * map_target.apix / 2
-    # points_array = []
+
     for z in range(len(map_target.fullMap)):
         for y in range(len(map_target.fullMap[z])):
             for x in range(len(map_target.fullMap[z][y])):
@@ -32,5 +32,4 @@ def main(map_target, output_path):
                 else:
                     map_target.fullMap[z][y][x] = 0
 
-    map_target.write_to_MRC_file(output_path)
     return map_target

@@ -1,14 +1,12 @@
-import numpy as np
-import copy
+import math
+
 from classes import *
 from graph import angle
-import math
-from scipy.spatial import distance
 
 
-ANGLE_BETWEEN_REGIONS = math.pi / 9
-MID_DIST_DEFAULT = 100000000000
-LINE_DIST_DEFAULT = 10
+ANGLE_BETWEEN_REGIONS = 20
+MID_DIST_DEFAULT = 13
+LINE_DIST_DEFAULT = 4
 
 APIX = None
 
@@ -26,7 +24,7 @@ def angle_satisfiable(region_1, region_2):
         print len(region_1.nodes), len(region_2.nodes)
         return False
     angle_1, angle_2 = region_1.pca.components_[0], region_2.pca.components_[0]
-    return angle(angle_1, angle_2) < ANGLE_BETWEEN_REGIONS
+    return angle(angle_1, angle_2)*57.2958 < ANGLE_BETWEEN_REGIONS
 
 
 def midpoint_distance(region_1, region_2):
@@ -52,9 +50,8 @@ def distance_between_points(point_1, point_2):
     return np.linalg.norm(point_1 - point_2)
 
 
-def main(graph, theta, mid, line, apix):
-    global ANGLE_BETWEEN_REGIONS
-    ANGLE_BETWEEN_REGIONS = theta
+def main(graph, mid, line, apix):
+
     global APIX
     APIX = apix
     global MID_DIST_DEFAULT

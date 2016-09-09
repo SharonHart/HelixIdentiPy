@@ -17,15 +17,13 @@ from pruning import main as pruning
 dir_path = os.path.dirname(os.path.realpath(__file__))
 source_dir = dir_path + "/source/"
 templates_dir = dir_path + "/Templates/"
+template_format = "template{0}_{1}.mrc"
 target_path = ""
-target_map = None
-cylinder_map = None
-apix = None
+
 
 def create_project_dirs():
     """
     Create project directories
-    :return: None
     """
     if not os.path.exists(source_dir):
         os.makedirs(source_dir)
@@ -33,6 +31,11 @@ def create_project_dirs():
         os.makedirs(templates_dir)
 
 def read_map(input_path):
+    """
+    Read map file from path, Using TemPy
+    :param input_path: input target map path
+    :return: target map instance, target map apix
+    """
     try:
         target_map = MapParser.readMRC(input_path)
         apix = target_map.apix  # Target map resolution
@@ -41,7 +44,7 @@ def read_map(input_path):
         print Messages.INPUT_FILES_ERROR
 
 
-def run_templates(run):
+def run_templates(target_map, run):
     """
     Creates ideal cylinder and templates based on its rotations
     :param run: boolean. Whether to run again or load rel. files
@@ -50,10 +53,11 @@ def run_templates(run):
     try:
         if run:
             utils.set_status(Messages.START_CYL)
-            cylinder_map = cylinder_creation(target_map, output_path=source_dir + "Cylinder.mrc")
+            cylinder_map = cylinder_creation(target_map)
+            cylinder_map.write_to_MRC_file(source_dir + "Cylinder.mrc")
             utils.set_status(Messages.END_CYL)
             utils.set_status(Messages.START_TEMPLATES)
-            dic_directions = create_templates(target_map, cylinder_map)
+            dic_directions = create_templates(target_map.apix, cylinder_map, templates_dir, template_format)
             utils.set_status(Messages.END_TEMPLATES)
             utils.dump(path=source_dir + "dir_directions.p", object=dic_directions)
         else:
@@ -64,7 +68,7 @@ def run_templates(run):
         return None
 
 
-def run_correlation(run):
+def run_correlation(target_map, run):
     """
     Runs Cross-Correlation stage. finds maximal scored direction for each matrix voxel.
     Saves results, max_score and max_dirs, as np objects
@@ -74,7 +78,7 @@ def run_correlation(run):
     try:
         if run:
             utils.set_status(Messages.START_CORRELATION)
-            max_scores, max_dirs = correlate(target_map)
+            max_scores, max_dirs = correlate(target_map, templates_dir, template_format)
             utils.dump(path=source_dir + "max_score",object=max_scores ,is_np=True)
             utils.dump(path=source_dir + "max_dirs",object=max_dirs ,is_np=True)
             utils.set_status(Messages.DONE_CORRELATION)
@@ -87,7 +91,7 @@ def run_correlation(run):
         return None
 
 
-def run_graph(run, theta,apix, THRESHOLD, scores, directions, dic_direct):
+def run_graph(target_map, run, theta,apix, THRESHOLD, scores, directions, dic_direct):
     """
     Runs Graph creation and Nodes connection stage. Saves result as regions_graph.p
     :param run: boolean. Whether to run again or load rel. files
@@ -109,7 +113,7 @@ def run_graph(run, theta,apix, THRESHOLD, scores, directions, dic_direct):
         return None
 
 
-def run_linkage(run, graph, theta, mid, line, apix):
+def run_linkage(run, graph, mid, line, apix):
     """
     Runs Linkage Stage. Saves output as linked_graph
     :param run: boolean. Whether to run again or load rel. files
@@ -120,7 +124,7 @@ def run_linkage(run, graph, theta, mid, line, apix):
     try:
         if run:
             utils.set_status(Messages.START_LINK)
-            graph2=link_regions(graph, theta, mid, line, apix)
+            graph2=link_regions(graph, mid, line, apix)
             utils.set_status(Messages.END_LINK)
             utils.dump(path=source_dir + "linked_graph.p", object=graph2)
         else:
@@ -131,7 +135,7 @@ def run_linkage(run, graph, theta, mid, line, apix):
         return None
 
 
-def run_pruning(run, graph2, target_map):
+def run_pruning(target_map, run, graph2):
     """
     Runs pruning
     :param run: boolean. Whether to run again or load rel. files
@@ -178,27 +182,26 @@ def main(thresh, theta, mid, line, start, input_path):
     global target_path
     target_path = input_path
 
-    # Create projects directories for intermidiate file savings
+    # Create projects directories for intermediate file savings
     create_project_dirs()
 
     # Read map input file. Get map instance and its apix
-    global target_map
     target_map, apix = read_map(input_path=input_path)
 
     # Generate templates. Get directions vectors
-    dic_directions = run_templates(run=True if start<1 else False)
+    dic_directions = run_templates(target_map, run=True if start<1 else False)
 
     # Run correlation. Get man scores and max directions dicts
-    max_scores, max_dirs = run_correlation(run=True if start<2 else False)
+    max_scores, max_dirs = run_correlation(target_map, run=True if start<2 else False)
 
     # Run graph creation. Get regional graph with high scored voxels as Nodes
-    graph = run_graph(run=True if start<3 else False, scores=max_scores,directions= max_dirs,dic_direct=dic_directions,
+    graph = run_graph(target_map, run=True if start<3 else False, scores=max_scores,directions= max_dirs,dic_direct=dic_directions,
                       theta=theta, apix=apix, THRESHOLD=thresh)
     # Run linkage. Get regional graph after region linking
-    graph2 = run_linkage(run=True if start<4 else False, graph=graph, theta=theta, mid=mid, line=line, apix=apix)
+    graph2 = run_linkage(run=True if start<4 else False, graph=graph, mid=mid, line=line, apix=apix)
 
     # Run pruning. Get regional graph after bad regions prune
-    output, graph3 = run_pruning(run=True if start<5 else False, graph2=graph2, target_map=target_map)
+    output, graph3 = run_pruning(target_map=target_map, run=True if start<5 else False, graph2=graph2)
 
     utils.set_status(Messages.END_RUN.format(len(graph2.regions)))
 

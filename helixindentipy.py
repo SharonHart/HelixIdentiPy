@@ -1,6 +1,6 @@
 import sys
 
-from gui_class import main as gui
+from gui import main as gui
 from main import main as main_go
 from messages import Messages
 
