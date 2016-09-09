@@ -44,7 +44,7 @@ def read_map(input_path):
         print Messages.INPUT_FILES_ERROR
 
 
-def run_templates(target_map, run):
+def run_templates(target_map_path, run):
     """
     Creates ideal cylinder and templates based on its rotations
     :param run: boolean. Whether to run again or load rel. files
@@ -52,6 +52,7 @@ def run_templates(target_map, run):
     """
     try:
         if run:
+            target_map, apix = read_map(target_path)
             utils.set_status(Messages.START_CYL)
             cylinder_map = cylinder_creation(target_map)
             cylinder_map.write_to_MRC_file(source_dir + "Cylinder.mrc")
@@ -91,7 +92,7 @@ def run_correlation(target_map, run):
         return None
 
 
-def run_graph(target_map, run, theta,apix, THRESHOLD, scores, directions, dic_direct):
+def run_graph(target_map, run, theta, THRESHOLD, scores, directions, dic_direct):
     """
     Runs Graph creation and Nodes connection stage. Saves result as regions_graph.p
     :param run: boolean. Whether to run again or load rel. files
@@ -102,7 +103,7 @@ def run_graph(target_map, run, theta,apix, THRESHOLD, scores, directions, dic_di
     try:
         if run:
             utils.set_status(Messages.START_GRAPH)
-            graph = graph_creation(target_map, scores, directions, dic_direct, theta,apix, thresh=THRESHOLD)
+            graph = graph_creation(target_map, scores, directions, dic_direct, theta, thresh=THRESHOLD)
             utils.set_status(Messages.END_GRAPH)
             utils.dump(path=source_dir + "regions_graph.p", object=graph)
         else:
@@ -141,21 +142,22 @@ def run_pruning(target_map, run, graph2):
     :param run: boolean. Whether to run again or load rel. files
     :return: Regional graph after pruning
     """
-    try:
-        if run:
-            utils.set_status(Messages.START_PRUN)
-            output, graph3 = pruning(graph2, target_map)
-            utils.set_status(Messages.END_PRUN)
-            utils.dump(path=source_dir + "output", object=output, is_np=True)
-            utils.dump(path=source_dir + "graph3.p", object=graph3, is_np=False)
+    # try:
+    if run:
+        utils.set_status(Messages.START_PRUN)
+        output, graph3 = pruning(graph2, target_map)
+        utils.set_status(Messages.END_PRUN)
+        utils.dump(path=dir_path + "output", object=output, is_np=True)
+        utils.dump(path=source_dir + "graph3.p", object=graph3, is_np=False)
 
-        else:
-            output = utils.load(path=source_dir + "output", is_np=True)
-            graph3 = utils.load(path=source_dir + "graph3.p", is_np=False)
-        return output, graph3
-    except Exception as e:
-        utils.set_status(Messages.FAIL_PRUN)
-        return None
+    else:
+        output = utils.load(path=source_dir + "output", is_np=True)
+        graph3 = utils.load(path=source_dir + "graph3.p", is_np=False)
+    return output, graph3
+# except Exception as e:
+    #     utils.set_status(Messages.FAIL_PRUN)
+    #     print e.message
+    #     return None
 
 
 def back_main(thresh, theta, mid, line, start, target_path):
@@ -189,14 +191,14 @@ def main(thresh, theta, mid, line, start, input_path):
     target_map, apix = read_map(input_path=input_path)
 
     # Generate templates. Get directions vectors
-    dic_directions = run_templates(target_map, run=True if start<1 else False)
+    dic_directions = run_templates(target_path, run=True if start<1 else False)
 
     # Run correlation. Get man scores and max directions dicts
     max_scores, max_dirs = run_correlation(target_map, run=True if start<2 else False)
 
     # Run graph creation. Get regional graph with high scored voxels as Nodes
     graph = run_graph(target_map, run=True if start<3 else False, scores=max_scores,directions= max_dirs,dic_direct=dic_directions,
-                      theta=theta, apix=apix, THRESHOLD=thresh)
+                      theta=theta, THRESHOLD=thresh)
     # Run linkage. Get regional graph after region linking
     graph2 = run_linkage(run=True if start<4 else False, graph=graph, mid=mid, line=line, apix=apix)
 

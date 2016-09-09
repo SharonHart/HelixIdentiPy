@@ -35,30 +35,17 @@ def main(graph, target_size):
     z = np.array([z[2] for z in points], \
                  dtype=np.float)
     c = np.array(colors, dtype=np.float)
-    # s = np.array([50 for k in range(len(x))], dtype=np.float)
 
     x_all = np.concatenate((x_all, x), axis=0)
     y_all = np.concatenate((y_all, y), axis=0)
     z_all = np.concatenate((z_all, z), axis=0)
 
     c_all = c
-    # s_all = np.concatenate((s_all, s), axis=0)
 
     plt.tick_params(axis='both', which='major', labelsize=55)
 
     ax.scatter(x_all, y_all, z_all, c=c_all, alpha=0.5)
-    # plt.xlim(X_LIM)
-    # plt.ylim(Y_LIM)
     ax.set_xlabel('X Label')
     ax.set_ylabel('Y Label')
     ax.set_zlabel('Z Label')
-    # plt.savefig("3d_plot.png")
-    # plt.figure(figsize=(30, 30))
     plt.show()
-    # plt.savefig(out_file_name)
-    #
-    # plt.clf()
-    # plt.close()
-
-
-    # plt.show()

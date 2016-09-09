@@ -1,3 +1,12 @@
+"""
+Main runfile
+
+command is either:
+    1) python helixindentipy.py gui; start the gui
+    2) python helixindentipy.py <path_to_target> threshold=<> theta=<> midpoint_distance=<> lin_distance=<> phase=<>
+
+"""
+
 import sys
 
 from gui import main as gui
@@ -5,10 +14,8 @@ from main import main as main_go
 from messages import Messages
 
 
-# command is either:
-#     1) python helixindentipy.py gui; start the gui
-#     2) python helixindentipy.py <path_to_target> threshold=<> theta=<> midpoint_distance=<> lin_distance=<> phase=<>
 def main():
+    # Default parameters
     threshold = None
     theta = 20
     mid = 13
@@ -50,6 +57,7 @@ def main():
                     elif value == "just_plot":
                         phase = 4
 
+        # Run the main loop
         main_go(threshold, theta, mid, line, phase, path)
 
 

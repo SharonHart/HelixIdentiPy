@@ -7,7 +7,7 @@ import numpy as np
 import math
 
 STD_THRESHOLD = 0.2
-HELIX_LENGTH_THRESHOLD = 1000
+HELIX_LENGTH_THRESHOLD = 10000
 
 def main(graph, target_map):
     # calculate non zero mean of the fillMap
@@ -30,8 +30,7 @@ def main(graph, target_map):
             continue
         if region.eigenvalues[0] > HELIX_LENGTH_THRESHOLD:
             continue
-        if len(region.nodes) <= 8:
-            continue
+
         # If all of the above are valid, add the region to the final region list
         valid_regions.append(region)
     print "pruned {}".format(len(graph.regions) - len(valid_regions))

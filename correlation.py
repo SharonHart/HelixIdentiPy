@@ -4,7 +4,6 @@ Returns a score matrix and a direction matrix holding the best directions f.e. v
 """
 
 import math
-import os
 
 import numpy as np
 from TEMPy.MapParser import *

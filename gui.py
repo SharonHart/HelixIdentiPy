@@ -1,3 +1,7 @@
+"""
+GUI Class. Uses Tkinter for graphical interface
+"""
+
 from Tkinter import *
 
 import global_vars

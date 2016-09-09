@@ -13,6 +13,7 @@ class Messages:
     FAIL_LINK = "Linking regions failed :("
 
     START_GRAPH = "Creating graph..."
+    GRAPH_PROGRESS = "Joining nodes......\t{}%"
     END_GRAPH = "Graph ready!"
     FAIL_GRAPH = "Creating graph failed :("
 
