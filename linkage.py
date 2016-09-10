@@ -3,9 +3,10 @@ Connect graph regions under regional restrictions.
 """
 import math
 
+import utils
 from classes import *
 from graph import angle
-
+from messages import Messages
 
 ANGLE_BETWEEN_REGIONS = 20
 
@@ -101,8 +102,6 @@ def main(graph, mid, line, apix):
 
         # Run loop from first region to the last unified and try to unify with the last appended
         for i in range(0, last_unified):
-            if (i, j, len(graph.regions)) == (2, 3, 96):
-                pass
 
             region_1 = graph.regions[i]
             last_region = graph.regions[len(graph.regions)-1]
@@ -119,7 +118,7 @@ def main(graph, mid, line, apix):
                 graph.regions.remove(region_1)
                 graph.regions.remove(last_region)
                 graph.regions.append(linked_region)
-
+            utils.set_status(Messages.START_LINK, same_line=True, effect=True)
         # If no regions connected with the new regions from last loop, run from the last unified region index
         for i in range(last_unified, len(graph.regions)):
             for j in range(i + 1, len(graph.regions)):
@@ -149,5 +148,6 @@ def main(graph, mid, line, apix):
                 # save to which index we have arrived last time we linked region1 with a non-last region2
                 last_unified = i
                 break
+            utils.set_status(Messages.START_LINK, same_line=True, effect=True)
 
     return graph

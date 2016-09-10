@@ -2,8 +2,8 @@
 Main runfile
 
 command is either:
-    1) python helixindentipy.py gui; start the gui
-    2) python helixindentipy.py <path_to_target> threshold=<> theta=<> midpoint_distance=<> lin_distance=<> phase=<>
+    1) python helixidentipy.py gui; start the gui
+    2) python helixidentipy.py <path_to_target> threshold=<> theta=<> midpoint_distance=<> lin_distance=<> phase=<>
 
 """
 

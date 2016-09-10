@@ -9,6 +9,10 @@ import numpy as np
 
 import global_vars
 
+counter = 0
+slashes = ["\\", "|", "/", "|"]
+
+
 def dump(path, object, is_np=False):
     """
     Write to filesystem, an object, to numpy or pickle format file
@@ -39,16 +43,26 @@ def load(path, is_np=False):
             return np.load(g)
 
 
-def set_status(stat, same_line=False):
+def special(stat):
+    global counter
+    global slashes
+    counter += 1
+    counter %= 4
+    return stat + slashes[counter]
+
+
+def set_status(stat, same_line=False, effect=False):
     """
     :param stat: String. Output message
     :param same_line: boolean. print in the same line or not
     """
+    if effect:
+        stat = special(stat)
     if global_vars.isGui:
         global_vars.status_bar.set(stat)
     else:
         if same_line:
-            print("\r"+stat, end=" ")
+            print("\r" + stat, end=" ")
             sys.stdout.flush()
         else:
             print(stat)
