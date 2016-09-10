@@ -7,6 +7,8 @@ import utils
 from classes import *
 from graph import angle
 from messages import Messages
+from scipy.spatial import distance
+
 
 ANGLE_BETWEEN_REGIONS = 20
 
@@ -57,15 +59,7 @@ def line_distance(region_1, region_2):
     :param region_2: Region
     :return: float
     """
-    min_dist = float('Inf')
-    # Calculate the minimal distance between any point from one region and any point from the other
-    for node_1 in region_1.nodes:
-        for node_2 in region_2.nodes:
-            dist = distance_between_points(np.array(node_1.voxel), np.array(node_2.voxel))
-            if dist < min_dist:
-                min_dist = dist
-    return min_dist
-
+    return distance.cdist([node.voxel for node in region_1.nodes], [node.voxel for node in region_2.nodes], metric="euclidean").min()
 
 def distances_satisfiable(region_1, region_2, mid, line, APIX):
     """
@@ -81,7 +75,7 @@ def distance_between_points(point_1, point_2):
     """
     Get the distance between two point voxels
     """
-    return np.linalg.norm(point_1 - point_2)
+    return distance.euclidean(point_1, point_2)
 
 
 def main(graph, mid, line, apix):
@@ -122,8 +116,6 @@ def main(graph, mid, line, apix):
         # If no regions connected with the new regions from last loop, run from the last unified region index
         for i in range(last_unified, len(graph.regions)):
             for j in range(i + 1, len(graph.regions)):
-                if (i,j, len(graph.regions)) == (2, 3, 96):
-                    pass
 
                 region_1 = graph.regions[i]
                 region_2 = graph.regions[j]
